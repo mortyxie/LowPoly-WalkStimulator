@@ -32,6 +32,15 @@ size = Vector3(1, 5, 25)
 [sub_resource type="BoxShape3D" id="BoxShape3D_31lcy"]
 size = Vector3(0.5, 5, 1.5)
 
+[sub_resource type="BoxShape3D" id="BoxShape3D_d3235"]
+size = Vector3(0.2, 3, 11.5)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_vgtvi"]
+size = Vector3(0.2, 3, 1.5)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_4nrum"]
+size = Vector3(0.3, 3, 6)
+
 [sub_resource type="BoxShape3D" id="BoxShape3D_wubwk"]
 size = Vector3(25, 5.916504, 0.18)
 
@@ -53,14 +62,35 @@ size = Vector3(8, 0.5, 0.2)
 [sub_resource type="BoxShape3D" id="BoxShape3D_i8305"]
 size = Vector3(5, 3, 0.2)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_d3235"]
-size = Vector3(0.2, 3, 11.5)
+[sub_resource type="BoxShape3D" id="BoxShape3D_q2xc8"]
+size = Vector3(8, 3, 0.6)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_vgtvi"]
-size = Vector3(0.2, 3, 1.5)
+[sub_resource type="BoxShape3D" id="BoxShape3D_iedaw"]
+size = Vector3(5, 3.0483398, 0.2)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_4nrum"]
-size = Vector3(0.3, 3, 6)
+[sub_resource type="BoxShape3D" id="BoxShape3D_blw1q"]
+size = Vector3(1, 3, 0.2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_2muiv"]
+size = Vector3(0.9, 3, 1.5)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_4dfy6"]
+size = Vector3(1, 3, 1)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_a70dc"]
+size = Vector3(2.335, 1, 0.895)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_3wc4a"]
+size = Vector3(1, 1, 2.19)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_7b43y"]
+size = Vector3(1.47, 1, 1)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_4p3m7"]
+size = Vector3(1, 1, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_575hj"]
+size = Vector3(2, 1.3155518, 1.1293945)
 
 [sub_resource type="Environment" id="Environment_q2xc8"]
 ambient_light_source = 2
@@ -128,6 +158,18 @@ shape = SubResource("BoxShape3D_oe3w0")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.89917, 1.2181319, -16.129656)
 shape = SubResource("BoxShape3D_31lcy")
 
+[node name="coll_wall_left" type="CollisionShape3D" parent="Home_Collision" unique_id=1493512768]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.985474, 1.4905474, -11.118988)
+shape = SubResource("BoxShape3D_d3235")
+
+[node name="coll_wall_left2" type="CollisionShape3D" parent="Home_Collision" unique_id=915892735]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.99316, 1.4837356, -3.6478727)
+shape = SubResource("BoxShape3D_vgtvi")
+
+[node name="coll_wall_left3" type="CollisionShape3D" parent="Home_Collision" unique_id=1001323212]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.0472245, 1.4644912, 0)
+shape = SubResource("BoxShape3D_4nrum")
+
 [node name="coll_wall_front" type="CollisionShape3D" parent="Home_Collision" unique_id=437338506]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.45825195, 2.9461548)
 shape = SubResource("BoxShape3D_wubwk")
@@ -156,17 +198,45 @@ shape = SubResource("BoxShape3D_mee45")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.581933, 1.5869043, -2.9948108)
 shape = SubResource("BoxShape3D_i8305")
 
-[node name="coll_wall_left" type="CollisionShape3D" parent="Home_Collision" unique_id=1493512768]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.985474, 1.4905474, -11.118988)
-shape = SubResource("BoxShape3D_d3235")
+[node name="coll_wall_front8" type="CollisionShape3D" parent="Home_Collision" unique_id=1434853979]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.9588437, 1.5499651, -9.015344)
+shape = SubResource("BoxShape3D_q2xc8")
 
-[node name="coll_wall_left2" type="CollisionShape3D" parent="Home_Collision" unique_id=915892735]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.99316, 1.4837356, -3.6478727)
-shape = SubResource("BoxShape3D_vgtvi")
+[node name="coll_wall_front9" type="CollisionShape3D" parent="Home_Collision" unique_id=1285978808]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.4877051, 1.4125133, -12.000596)
+shape = SubResource("BoxShape3D_iedaw")
 
-[node name="coll_wall_left3" type="CollisionShape3D" parent="Home_Collision" unique_id=1001323212]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.0472245, 1.4644912, 0)
-shape = SubResource("BoxShape3D_4nrum")
+[node name="coll_wall_front10" type="CollisionShape3D" parent="Home_Collision" unique_id=134258205]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.4975252, 1.398686, -12.002571)
+shape = SubResource("BoxShape3D_blw1q")
+
+[node name="coll_wall_front11" type="CollisionShape3D" parent="Home_Collision" unique_id=1013105549]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.6608217, 1.4840395, 2.6175442)
+shape = SubResource("BoxShape3D_2muiv")
+
+[node name="coll_wall_front12" type="CollisionShape3D" parent="Home_Collision" unique_id=1026365401]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.6393936, 1.4989853, 0.34476018)
+shape = SubResource("BoxShape3D_4dfy6")
+
+[node name="coll_table" type="CollisionShape3D" parent="Home_Collision" unique_id=1883340036]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.8502364, 0.50901824, 1.2871482)
+shape = SubResource("BoxShape3D_a70dc")
+
+[node name="coll_table2" type="CollisionShape3D" parent="Home_Collision" unique_id=524332679]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.4521625, 0.48806453, -1.0901924)
+shape = SubResource("BoxShape3D_3wc4a")
+
+[node name="coll_table3" type="CollisionShape3D" parent="Home_Collision" unique_id=959189853]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.972873, 0.47428995, -2.5667171)
+shape = SubResource("BoxShape3D_7b43y")
+
+[node name="coll_table4" type="CollisionShape3D" parent="Home_Collision" unique_id=1075208945]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.734632, 0, -6.709418)
+shape = SubResource("BoxShape3D_4p3m7")
+
+[node name="coll_table5" type="CollisionShape3D" parent="Home_Collision" unique_id=43876212]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.016342, 0.17723125, -10.521216)
+shape = SubResource("BoxShape3D_575hj")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1978967886]
 environment = SubResource("Environment_q2xc8")
