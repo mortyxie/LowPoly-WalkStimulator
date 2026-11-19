@@ -1,0 +1,123 @@
+[gd_scene format=3 uid="uid://fnwjbm7urb4m"]
+
+[ext_resource type="PackedScene" uid="uid://d117jjpv6ru6e" path="res://ENV/DoriHome.glb" id="1_utrsm"]
+[ext_resource type="Script" uid="uid://dm1wg7o6146hn" path="res://addons/psx_look/psx_screen.gd" id="3_dprn0"]
+[ext_resource type="PackedScene" uid="uid://dy26xc485fhld" path="res://addons/srcoder_fps_controller/player.tscn" id="3_e3ne0"]
+[ext_resource type="Script" uid="uid://cvuwe3hux3g8s" path="res://ENV/interactable.gd" id="3_yh3jj"]
+[ext_resource type="Script" uid="uid://dbshy5vsa5d1u" path="res://camera_interact.gd" id="4_e3ne0"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_ixvud"]
+margin = 0.0
+radius = 0.2
+height = 1.5
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_bs4ga"]
+size = Vector3(20, 0.2, 25)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_mbsy3"]
+size = Vector3(2, 1, 2.48)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_wubwk"]
+size = Vector3(25, 5.916504, 0.18)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_vdbkr"]
+size = Vector3(25, 5, 0.18)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_78qxj"]
+size = Vector3(0.2, 5, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_pkerd"]
+size = Vector3(0.5, 5, 8)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_oe3w0"]
+size = Vector3(1, 5, 25)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_31lcy"]
+size = Vector3(0.5, 5, 1.5)
+
+[sub_resource type="Environment" id="Environment_q2xc8"]
+ambient_light_source = 2
+ambient_light_color = Color(0.3172787, 0.31727865, 0.31727865, 1)
+
+[node name="Node3D" type="Node3D" unique_id=307811651]
+
+[node name="SubViewportContainer" type="SubViewportContainer" parent="." unique_id=1983801156]
+visible = false
+texture_filter = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+stretch = true
+stretch_shrink = 2
+script = ExtResource("3_dprn0")
+
+[node name="SubViewport" type="SubViewport" parent="SubViewportContainer" unique_id=1965904131]
+handle_input_locally = false
+size = Vector2i(576, 324)
+render_target_update_mode = 0
+
+[node name="Player" parent="SubViewportContainer" unique_id=98517058 instance=ExtResource("3_e3ne0")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.65029204, 1.278375, 1.7793486)
+
+[node name="CollisionShape3D2" type="CollisionShape3D" parent="SubViewportContainer/Player" unique_id=1213214584]
+shape = SubResource("CapsuleShape3D_ixvud")
+
+[node name="CameraPivot2" type="Node3D" parent="SubViewportContainer/Player" unique_id=558821389]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3, 0)
+
+[node name="Camera3D" type="Camera3D" parent="SubViewportContainer/Player" unique_id=645933238 node_paths=PackedStringArray("prompt_label")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+current = true
+script = ExtResource("4_e3ne0")
+prompt_label = NodePath("../../../PromptLabel")
+
+[node name="Home_Collision" type="StaticBody3D" parent="." unique_id=1501201991]
+
+[node name="coll_floor_main" type="CollisionShape3D" parent="Home_Collision" unique_id=2080519027]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.456831, -0.06665623, -6.845256)
+shape = SubResource("BoxShape3D_bs4ga")
+
+[node name="coll_bed" type="CollisionShape3D" parent="Home_Collision" unique_id=1061328214]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.0985053, 0.051191628, 1.6085272)
+shape = SubResource("BoxShape3D_mbsy3")
+
+[node name="coll_wall_front" type="CollisionShape3D" parent="Home_Collision" unique_id=437338506]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.45825195, 2.9461548)
+shape = SubResource("BoxShape3D_wubwk")
+
+[node name="coll_wall_back" type="CollisionShape3D" parent="Home_Collision" unique_id=938297825]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -16.231289)
+shape = SubResource("BoxShape3D_vdbkr")
+
+[node name="coll_wall_right" type="CollisionShape3D" parent="Home_Collision" unique_id=1683821147]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.0193539, 1.2037963, -4.00165)
+shape = SubResource("BoxShape3D_78qxj")
+
+[node name="coll_wall_right2" type="CollisionShape3D" parent="Home_Collision" unique_id=43124098]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.9077332, 1.34022, -9.960207)
+shape = SubResource("BoxShape3D_pkerd")
+
+[node name="coll_wall_right3" type="CollisionShape3D" parent="Home_Collision" unique_id=2123620008]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.0312505, 0.94960403, -6.566335)
+shape = SubResource("BoxShape3D_oe3w0")
+
+[node name="coll_wall_right4" type="CollisionShape3D" parent="Home_Collision" unique_id=1456151233]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.89917, 1.2181319, -16.129656)
+shape = SubResource("BoxShape3D_31lcy")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1978967886]
+environment = SubResource("Environment_q2xc8")
+
+[node name="PromptLabel" type="Label" parent="." unique_id=1814303972]
+visible = false
+offset_right = 40.0
+offset_bottom = 23.0
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=2140103070]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.1965085, 1.187312, 0)
+light_color = Color(0.35079023, 0.7875562, 0.90506023, 1)
+light_energy = 0.2
+sky_mode = 1
+
+[node name="DoriHome" parent="." unique_id=1998300829 instance=ExtResource("1_utrsm")]
+script = ExtResource("3_yh3jj")

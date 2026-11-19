@@ -1,0 +1,6 @@
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://wbogn4xnsamj"]
+
+[ext_resource type="Texture2D" uid="uid://ccgrich345jdg" path="res://char_/mat_/Drifter_PS1_BaseColor_512.png" id="1_qko3r"]
+
+[resource]
+albedo_texture = ExtResource("1_qko3r")

@@ -1,0 +1,18 @@
+[gd_scene format=3 uid="uid://dy26xc485fhld"]
+
+[ext_resource type="Script" uid="uid://xmjv1yoy3ve1" path="res://addons/srcoder_fps_controller/assets/scripts/player.gd" id="1_f6swd"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_ha1jo"]
+
+[node name="Player" type="CharacterBody3D" unique_id=1391740632]
+physics_interpolation_mode = 1
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.10191, 0)
+script = ExtResource("1_f6swd")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1213471832]
+shape = SubResource("CapsuleShape3D_ha1jo")
+
+[node name="CameraPivot" type="Node3D" parent="." unique_id=2056601659]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.49559, 0)
+
+[node name="Camera3D" type="Camera3D" parent="CameraPivot" unique_id=367968081]

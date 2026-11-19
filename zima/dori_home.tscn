@@ -1,0 +1,59 @@
+[gd_scene format=3 uid="uid://b030hslasm8xm"]
+
+[ext_resource type="PackedScene" uid="uid://bvkr6bpdi8cjk" path="res://ENV/DoriHome.glb" id="1_evnn0"]
+[ext_resource type="Texture2D" uid="uid://dq43itas1dug2" path="res://ENV/DoriHome_微信图片_20261119151007_641_123.jpg" id="2_rgy33"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_36kqn"]
+resource_name = "材质.001"
+cull_mode = 2
+albedo_texture = ExtResource("2_rgy33")
+roughness = 0.5
+metadata/_gltf_primary_texture_coord = 0
+
+[sub_resource type="ArrayMesh" id="ArrayMesh_vk3s8"]
+_surfaces = [{
+"aabb": AABB(-0.9049816, 0, -1, 1.9049816, 1e-05, 2),
+"format": 34896613377,
+"index_count": 6,
+"index_data": PackedByteArray(0, 0, 1, 0, 2, 0, 0, 0, 3, 0, 1, 0),
+"name": "材质.001",
+"primitive": 3,
+"uv_scale": Vector4(0, 0, 0, 0),
+"vertex_count": 4,
+"vertex_data": PackedByteArray(0, 0, 0, 0, 255, 255, 0, 0, 255, 255, 0, 0, 0, 0, 0, 0, 255, 255, 0, 0, 255, 255, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+}]
+blend_shape_mode = 0
+
+[sub_resource type="ArrayMesh" id="ArrayMesh_42hwk"]
+resource_name = "DoriHome_平面_001"
+_surfaces = [{
+"aabb": AABB(-0.9049816, 0, -1, 1.9049816, 1e-05, 2),
+"attribute_data": PackedByteArray(84, 219, 254, 211, 158, 20, 229, 246, 11, 21, 139, 212, 107, 217, 53, 249),
+"format": 34896613399,
+"index_count": 6,
+"index_data": PackedByteArray(0, 0, 1, 0, 2, 0, 0, 0, 3, 0, 1, 0),
+"material": SubResource("StandardMaterial3D_36kqn"),
+"name": "材质.001",
+"primitive": 3,
+"uv_scale": Vector4(0, 0, 0, 0),
+"vertex_count": 4,
+"vertex_data": PackedByteArray(0, 0, 0, 0, 255, 255, 85, 255, 255, 255, 0, 0, 0, 0, 67, 255, 255, 255, 0, 0, 255, 255, 131, 255, 0, 0, 0, 0, 0, 0, 30, 254, 186, 128, 161, 191, 206, 128, 151, 191, 67, 192, 136, 0, 12, 130, 248, 190)
+}]
+blend_shape_mode = 0
+shadow_mesh = SubResource("ArrayMesh_vk3s8")
+
+[node name="DoriHome" unique_id=650177602 instance=ExtResource("1_evnn0")]
+
+[node name="wdw_002" parent="." index="97" unique_id=1001567450]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.05816555, 0, 0)
+
+[node name="wdw_004" parent="." index="99" unique_id=1446149893]
+transform = Transform3D(0.9999633, 0, -0.008567214, 0, 1, 0, 0.008567214, 0, 0.9999633, 2.5, 1.9632437, 3)
+
+[node name="平面_001" type="MeshInstance3D" parent="平面_001" parent_id_path=PackedInt32Array(1020736826) index="0" unique_id=1938649408]
+transform = Transform3D(0.84356344, 0, 0, 0, 2.1465523, 0, 0, 0, 0.98944026, -0.14440185, 1.2034074, -0.057811737)
+mesh = SubResource("ArrayMesh_42hwk")
+
+[node name="平面_001" type="MeshInstance3D" parent="平面_001/平面_001" index="0" unique_id=379950499]
+transform = Transform3D(-0.07706595, 2.1375759, 0, -0.84003603, -0.19610399, 0, 0, 0, 0.9894402, 1.1954988, -0.32698092, 0.06864643)
+mesh = SubResource("ArrayMesh_42hwk")
