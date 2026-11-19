@@ -1,5 +1,6 @@
 [gd_scene format=3 uid="uid://fnwjbm7urb4m"]
 
+[ext_resource type="Script" uid="uid://bcsig2i6adtvr" path="res://main.gd" id="1_aiue8"]
 [ext_resource type="PackedScene" uid="uid://d117jjpv6ru6e" path="res://ENV/DoriHome.glb" id="1_utrsm"]
 [ext_resource type="Script" uid="uid://dm1wg7o6146hn" path="res://addons/psx_look/psx_screen.gd" id="3_dprn0"]
 [ext_resource type="PackedScene" uid="uid://dy26xc485fhld" path="res://addons/srcoder_fps_controller/player.tscn" id="3_e3ne0"]
@@ -93,164 +94,179 @@ size = Vector3(1, 1, 2)
 size = Vector3(2, 1.3155518, 1.1293945)
 
 [sub_resource type="Environment" id="Environment_q2xc8"]
+background_mode = 1
+background_color = Color(0.039215688, 0.047058824, 0.0627451, 1)
 ambient_light_source = 2
-ambient_light_color = Color(0.3172787, 0.31727865, 0.31727865, 1)
+ambient_light_color = Color(0.22745098, 0.2509804, 0.28235295, 1)
+ambient_light_energy = 0.3
+tonemap_exposure = 0.8
+fog_enabled = true
+fog_mode = 1
+fog_light_color = Color(0.43529412, 0.48235294, 0.53333336, 1)
+fog_density = 1.0
+fog_sky_affect = 0.7
+fog_depth_curve = 1.8025026
+fog_depth_begin = 3.0
+fog_depth_end = 35.0
 
 [node name="Node3D" type="Node3D" unique_id=307811651]
+script = ExtResource("1_aiue8")
 
-[node name="SubViewportContainer" type="SubViewportContainer" parent="." unique_id=1983801156]
-visible = false
+[node name="PSXScreen" type="SubViewportContainer" parent="." unique_id=1562549545]
 texture_filter = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+offset_right = -1112.0
+offset_bottom = -608.0
 stretch = true
-stretch_shrink = 2
 script = ExtResource("3_dprn0")
+metadata/_custom_type_script = "uid://dm1wg7o6146hn"
 
-[node name="SubViewport" type="SubViewport" parent="SubViewportContainer" unique_id=1965904131]
+[node name="SubViewport" type="SubViewport" parent="PSXScreen" unique_id=1965904131]
 handle_input_locally = false
-size = Vector2i(576, 324)
+size = Vector2i(40, 40)
 render_target_update_mode = 0
 
-[node name="Player" parent="SubViewportContainer" unique_id=98517058 instance=ExtResource("3_e3ne0")]
+[node name="world" type="Node3D" parent="PSXScreen/SubViewport" unique_id=544367427]
+
+[node name="Player" parent="PSXScreen/SubViewport/world" unique_id=98517058 instance=ExtResource("3_e3ne0")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.65029204, 1.278375, 1.7793486)
 
-[node name="CollisionShape3D2" type="CollisionShape3D" parent="SubViewportContainer/Player" unique_id=1213214584]
+[node name="CollisionShape3D2" type="CollisionShape3D" parent="PSXScreen/SubViewport/world/Player" unique_id=1213214584]
 shape = SubResource("CapsuleShape3D_ixvud")
 
-[node name="CameraPivot2" type="Node3D" parent="SubViewportContainer/Player" unique_id=558821389]
+[node name="CameraPivot2" type="Node3D" parent="PSXScreen/SubViewport/world/Player" unique_id=558821389]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3, 0)
 
-[node name="Camera3D" type="Camera3D" parent="SubViewportContainer/Player" unique_id=645933238 node_paths=PackedStringArray("prompt_label")]
+[node name="Camera3D" type="Camera3D" parent="PSXScreen/SubViewport/world/Player" unique_id=645933238 node_paths=PackedStringArray("prompt_label")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
 current = true
 script = ExtResource("4_e3ne0")
-prompt_label = NodePath("../../../PromptLabel")
+prompt_label = NodePath("../../../../../PromptLabel")
 
-[node name="Home_Collision" type="StaticBody3D" parent="." unique_id=1501201991]
+[node name="Home_Collision" type="StaticBody3D" parent="PSXScreen/SubViewport/world" unique_id=1501201991]
 
-[node name="coll_floor_main" type="CollisionShape3D" parent="Home_Collision" unique_id=2080519027]
+[node name="coll_floor_main" type="CollisionShape3D" parent="PSXScreen/SubViewport/world/Home_Collision" unique_id=2080519027]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.456831, -0.06665623, -6.845256)
 shape = SubResource("BoxShape3D_bs4ga")
 
-[node name="coll_bed" type="CollisionShape3D" parent="Home_Collision" unique_id=1061328214]
+[node name="coll_bed" type="CollisionShape3D" parent="PSXScreen/SubViewport/world/Home_Collision" unique_id=1061328214]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.0985053, 0.051191628, 1.6085272)
 shape = SubResource("BoxShape3D_mbsy3")
 
-[node name="coll_wall_back" type="CollisionShape3D" parent="Home_Collision" unique_id=938297825]
+[node name="coll_wall_back" type="CollisionShape3D" parent="PSXScreen/SubViewport/world/Home_Collision" unique_id=938297825]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -16.231289)
 shape = SubResource("BoxShape3D_vdbkr")
 
-[node name="coll_wall_right" type="CollisionShape3D" parent="Home_Collision" unique_id=1683821147]
+[node name="coll_wall_right" type="CollisionShape3D" parent="PSXScreen/SubViewport/world/Home_Collision" unique_id=1683821147]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.0193539, 1.2037963, -4.00165)
 shape = SubResource("BoxShape3D_78qxj")
 
-[node name="coll_wall_right2" type="CollisionShape3D" parent="Home_Collision" unique_id=43124098]
+[node name="coll_wall_right2" type="CollisionShape3D" parent="PSXScreen/SubViewport/world/Home_Collision" unique_id=43124098]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.9077332, 1.34022, -9.960207)
 shape = SubResource("BoxShape3D_pkerd")
 
-[node name="coll_wall_right3" type="CollisionShape3D" parent="Home_Collision" unique_id=2123620008]
+[node name="coll_wall_right3" type="CollisionShape3D" parent="PSXScreen/SubViewport/world/Home_Collision" unique_id=2123620008]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.0312505, 0.94960403, -6.566335)
 shape = SubResource("BoxShape3D_oe3w0")
 
-[node name="coll_wall_right4" type="CollisionShape3D" parent="Home_Collision" unique_id=1456151233]
+[node name="coll_wall_right4" type="CollisionShape3D" parent="PSXScreen/SubViewport/world/Home_Collision" unique_id=1456151233]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.89917, 1.2181319, -16.129656)
 shape = SubResource("BoxShape3D_31lcy")
 
-[node name="coll_wall_left" type="CollisionShape3D" parent="Home_Collision" unique_id=1493512768]
+[node name="coll_wall_left" type="CollisionShape3D" parent="PSXScreen/SubViewport/world/Home_Collision" unique_id=1493512768]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.985474, 1.4905474, -11.118988)
 shape = SubResource("BoxShape3D_d3235")
 
-[node name="coll_wall_left2" type="CollisionShape3D" parent="Home_Collision" unique_id=915892735]
+[node name="coll_wall_left2" type="CollisionShape3D" parent="PSXScreen/SubViewport/world/Home_Collision" unique_id=915892735]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.99316, 1.4837356, -3.6478727)
 shape = SubResource("BoxShape3D_vgtvi")
 
-[node name="coll_wall_left3" type="CollisionShape3D" parent="Home_Collision" unique_id=1001323212]
+[node name="coll_wall_left3" type="CollisionShape3D" parent="PSXScreen/SubViewport/world/Home_Collision" unique_id=1001323212]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.0472245, 1.4644912, 0)
 shape = SubResource("BoxShape3D_4nrum")
 
-[node name="coll_wall_front" type="CollisionShape3D" parent="Home_Collision" unique_id=437338506]
+[node name="coll_wall_front" type="CollisionShape3D" parent="PSXScreen/SubViewport/world/Home_Collision" unique_id=437338506]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.45825195, 2.9461548)
 shape = SubResource("BoxShape3D_wubwk")
 
-[node name="coll_wall_front2" type="CollisionShape3D" parent="Home_Collision" unique_id=2065302770]
+[node name="coll_wall_front2" type="CollisionShape3D" parent="PSXScreen/SubViewport/world/Home_Collision" unique_id=2065302770]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.08903706, 0.92750144, -3.0082393)
 shape = SubResource("BoxShape3D_qw4iv")
 
-[node name="coll_wall_front3" type="CollisionShape3D" parent="Home_Collision" unique_id=1989424094]
+[node name="coll_wall_front3" type="CollisionShape3D" parent="PSXScreen/SubViewport/world/Home_Collision" unique_id=1989424094]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.4797435, 1.0462122, -3.003192)
 shape = SubResource("BoxShape3D_d0xl3")
 
-[node name="coll_wall_front4" type="CollisionShape3D" parent="Home_Collision" unique_id=490231231]
+[node name="coll_wall_front4" type="CollisionShape3D" parent="PSXScreen/SubViewport/world/Home_Collision" unique_id=490231231]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.719354, 0.34318691, -13.252666)
 shape = SubResource("BoxShape3D_gc3ev")
 
-[node name="coll_wall_front5" type="CollisionShape3D" parent="Home_Collision" unique_id=429078279]
+[node name="coll_wall_front5" type="CollisionShape3D" parent="PSXScreen/SubViewport/world/Home_Collision" unique_id=429078279]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.253929, 1.5220518, -13.240834)
 shape = SubResource("BoxShape3D_keown")
 
-[node name="coll_wall_front6" type="CollisionShape3D" parent="Home_Collision" unique_id=1456866614]
+[node name="coll_wall_front6" type="CollisionShape3D" parent="PSXScreen/SubViewport/world/Home_Collision" unique_id=1456866614]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.0376353, 2.7167745, -13.249008)
 shape = SubResource("BoxShape3D_mee45")
 
-[node name="coll_wall_front7" type="CollisionShape3D" parent="Home_Collision" unique_id=1517309751]
+[node name="coll_wall_front7" type="CollisionShape3D" parent="PSXScreen/SubViewport/world/Home_Collision" unique_id=1517309751]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.581933, 1.5869043, -2.9948108)
 shape = SubResource("BoxShape3D_i8305")
 
-[node name="coll_wall_front8" type="CollisionShape3D" parent="Home_Collision" unique_id=1434853979]
+[node name="coll_wall_front8" type="CollisionShape3D" parent="PSXScreen/SubViewport/world/Home_Collision" unique_id=1434853979]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.9588437, 1.5499651, -9.015344)
 shape = SubResource("BoxShape3D_q2xc8")
 
-[node name="coll_wall_front9" type="CollisionShape3D" parent="Home_Collision" unique_id=1285978808]
+[node name="coll_wall_front9" type="CollisionShape3D" parent="PSXScreen/SubViewport/world/Home_Collision" unique_id=1285978808]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.4877051, 1.4125133, -12.000596)
 shape = SubResource("BoxShape3D_iedaw")
 
-[node name="coll_wall_front10" type="CollisionShape3D" parent="Home_Collision" unique_id=134258205]
+[node name="coll_wall_front10" type="CollisionShape3D" parent="PSXScreen/SubViewport/world/Home_Collision" unique_id=134258205]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.4975252, 1.398686, -12.002571)
 shape = SubResource("BoxShape3D_blw1q")
 
-[node name="coll_wall_front11" type="CollisionShape3D" parent="Home_Collision" unique_id=1013105549]
+[node name="coll_wall_front11" type="CollisionShape3D" parent="PSXScreen/SubViewport/world/Home_Collision" unique_id=1013105549]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.6608217, 1.4840395, 2.6175442)
 shape = SubResource("BoxShape3D_2muiv")
 
-[node name="coll_wall_front12" type="CollisionShape3D" parent="Home_Collision" unique_id=1026365401]
+[node name="coll_wall_front12" type="CollisionShape3D" parent="PSXScreen/SubViewport/world/Home_Collision" unique_id=1026365401]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.6393936, 1.4989853, 0.34476018)
 shape = SubResource("BoxShape3D_4dfy6")
 
-[node name="coll_table" type="CollisionShape3D" parent="Home_Collision" unique_id=1883340036]
+[node name="coll_table" type="CollisionShape3D" parent="PSXScreen/SubViewport/world/Home_Collision" unique_id=1883340036]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.8502364, 0.50901824, 1.2871482)
 shape = SubResource("BoxShape3D_a70dc")
 
-[node name="coll_table2" type="CollisionShape3D" parent="Home_Collision" unique_id=524332679]
+[node name="coll_table2" type="CollisionShape3D" parent="PSXScreen/SubViewport/world/Home_Collision" unique_id=524332679]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.4521625, 0.48806453, -1.0901924)
 shape = SubResource("BoxShape3D_3wc4a")
 
-[node name="coll_table3" type="CollisionShape3D" parent="Home_Collision" unique_id=959189853]
+[node name="coll_table3" type="CollisionShape3D" parent="PSXScreen/SubViewport/world/Home_Collision" unique_id=959189853]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.972873, 0.47428995, -2.5667171)
 shape = SubResource("BoxShape3D_7b43y")
 
-[node name="coll_table4" type="CollisionShape3D" parent="Home_Collision" unique_id=1075208945]
+[node name="coll_table4" type="CollisionShape3D" parent="PSXScreen/SubViewport/world/Home_Collision" unique_id=1075208945]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.734632, 0, -6.709418)
 shape = SubResource("BoxShape3D_4p3m7")
 
-[node name="coll_table5" type="CollisionShape3D" parent="Home_Collision" unique_id=43876212]
+[node name="coll_table5" type="CollisionShape3D" parent="PSXScreen/SubViewport/world/Home_Collision" unique_id=43876212]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.016342, 0.17723125, -10.521216)
 shape = SubResource("BoxShape3D_575hj")
 
-[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1978967886]
-environment = SubResource("Environment_q2xc8")
-
-[node name="PromptLabel" type="Label" parent="." unique_id=1814303972]
-visible = false
-offset_right = 40.0
-offset_bottom = 23.0
-
-[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=2140103070]
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="PSXScreen/SubViewport/world" unique_id=2140103070]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.1965085, 1.187312, 0)
-light_color = Color(0.35079023, 0.7875562, 0.90506023, 1)
+light_color = Color(0.2998779, 0.7007453, 0.76508814, 1)
 light_energy = 0.2
 sky_mode = 1
 
-[node name="DoriHome" parent="." unique_id=1998300829 instance=ExtResource("1_utrsm")]
+[node name="DoriHome" parent="PSXScreen/SubViewport/world" unique_id=1998300829 instance=ExtResource("1_utrsm")]
 script = ExtResource("3_yh3jj")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="PSXScreen/SubViewport/world" unique_id=1978967886]
+environment = SubResource("Environment_q2xc8")
+
+[node name="PromptLabel" type="Label" parent="." unique_id=1814303972]
+offset_right = 40.0
+offset_bottom = 23.0
