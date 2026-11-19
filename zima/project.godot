@@ -30,6 +30,7 @@ config/icon="res://icon.svg"
 
 button_prompts_manager="*uid://cy31x45v8vmkc"
 Audio="*uid://cujwm7u5pvogl"
+MouseLook="*uid://i0xtt6yhk6tn"
 
 [display]
 

@@ -1,65 +1,55 @@
 extends CharacterBody3D
 
-## The movement speed in m/s. Default is 5.
-@export_range(1.0,30.0) var speed : float = 5.0
-## The Jump Velocity in m/s- default to 6.0
-@export_range(2.0,10.0) var jump_velocity : float = 6.0
+@export_group("Movement")
+@export var speed := 5.0
+@export var jump_velocity := 6.0
+@export var ground_acceleration := 4.0
+@export var air_acceleration := 0.5
+@export var gravity := 15.0
 
-## Mouse sensitivity for looking around. Default is 3.0
-@export_range(1.0,5.0) var mouse_sensitivity = 3.0
-var mouse_motion : Vector2 = Vector2.ZERO
-var pitch = 0
+@export_group("Look")
+@export var mouse_sensitivity := 3.0
+@export var pitch_limit := 89.0
 
-## The amount of acceleration on the ground- less feels floaty, more is snappy-[br]Default is 4
-@export_range(1.0,10.0) var ground_acceleration := 4.0
-## the amount of acceleration when in the air. less feels more floaty more is more snappy.[br]Default is 0.5
-@export_range(0.0,5.0) var air_acceleration := 0.5
+@export_group("Nodes")
+@export var camera_pivot_path: NodePath = ^"CameraPivot2"
 
-# Get the gravity from the project settings to be synced with RigidBody nodes.
-@export_range(5.0,25.0) var gravity : float = 15.0
+var camera_pivot: Node3D
+var _pitch := 0.0
 
-# the camera pivot for head pitch movement
-@onready var camera_pivot : Node3D = $CameraPivot2
+func _ready() -> void:
+	camera_pivot = get_node_or_null(camera_pivot_path)
+	if camera_pivot == null:
+		push_error("player: camera pivot not found")
+	MouseLook.set_captured(true)
 
-func _physics_process(delta):
-	# Add the gravity.
+func _physics_process(delta: float) -> void:
+	if Input.is_action_just_pressed("ui_cancel"):
+		var captured := Input.get_mouse_mode() == Input.MOUSE_MODE_CAPTURED
+		MouseLook.set_captured(not captured)
+
 	if not is_on_floor():
 		velocity.y -= gravity * delta
 
-	# Handle Jump.
 	if Input.is_action_just_pressed("ui_accept") and is_on_floor():
 		velocity.y = jump_velocity
 
-	# Get the input direction and handle the movement/deceleration.
-	var input_dir = Input.get_vector("left", "right", "up", "down")
-	var direction = (transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()
-	var target_velocity := Vector3.ZERO
-	if direction:
-		target_velocity = direction * speed
-	#now apply velocity with lerp based on whether on ground or in air
-	if is_on_floor():
-		velocity.x = move_toward(velocity.x , target_velocity.x , speed * ground_acceleration * delta)
-		velocity.z = move_toward(velocity.z, target_velocity.z, speed * ground_acceleration * delta)
-	else:
-		velocity.x = move_toward(velocity.x , target_velocity.x , speed * air_acceleration * delta)
-		velocity.z = move_toward(velocity.z, target_velocity.z, speed * air_acceleration * delta)
-	#now actually move based on velocity
+	var input_dir := Input.get_vector("left", "right", "up", "down")
+	var direction := (global_transform.basis * Vector3(input_dir.x, 0.0, input_dir.y)).normalized()
+
+	var target := Vector3(direction.x * speed, 0.0, direction.z * speed)
+	var accel := ground_acceleration if is_on_floor() else air_acceleration
+	velocity.x = move_toward(velocity.x, target.x, accel * speed * delta)
+	velocity.z = move_toward(velocity.z, target.z, accel * speed * delta)
+
 	move_and_slide()
-	
-	#rotate the player and camera pivot based on mouse movement
-	rotate_y(-mouse_motion.x * mouse_sensitivity / 1000)
-	pitch -= mouse_motion.y * mouse_sensitivity / 1000
-	pitch = clamp(pitch,-1.35,1.35)
+
+	var motion := MouseLook.take_motion()
+	rotate_y(-motion.x * mouse_sensitivity / 1000.0)
+	_pitch = clamp(
+		_pitch - motion.y * mouse_sensitivity / 1000.0,
+		deg_to_rad(-pitch_limit),
+		deg_to_rad(pitch_limit)
+	)
 	if camera_pivot:
-		camera_pivot.rotation.x = pitch
-	#reset it
-	mouse_motion = Vector2.ZERO
-	
-
-#handle and store mouse motion
-func _input(event: InputEvent):
-	if event is InputEventMouseMotion:
-		mouse_motion = event.relative
-
-func _ready():
-	Input.set_mouse_mode(Input.MOUSE_MODE_HIDDEN)
+		camera_pivot.rotation.x = _pitch
