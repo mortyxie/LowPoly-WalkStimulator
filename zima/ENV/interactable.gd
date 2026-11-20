@@ -1,8 +1,9 @@
 extends Node3D
 
-# 示例：纸条。交互反馈统一走屏幕横幅（屏幕中上方浮现后淡出），
-# 不再 print 到 console。
-func interact():
-	MessageBanner.show_message("你查看了一下：上面什么都没写。", Color(0.9, 0.9, 0.9), 1.5)
-	# QuickAudio示例调用（你后面加音效直接用）
-	# QuickAudio.play_one_shot("res://audio/paper.wav")
+@export var display_name := "纸条"
+
+# 准星射线 E 交互；反馈统一走屏幕横幅（中上方浮现后淡出），不再 print
+func interact() -> void:
+	MessageBanner.show_message("你查看了一下：%s" % display_name, Color(0.9, 0.9, 0.9), 1.5)
+	# QuickAudio 示例调用（加音效直接用）
+	# Audio.play_sound(preload("res://Audio/sfx/interact/paper.ogg"))

@@ -6,9 +6,13 @@
 [ext_resource type="PackedScene" uid="uid://dy26xc485fhld" path="res://addons/srcoder_fps_controller/player.tscn" id="3_e3ne0"]
 [ext_resource type="Script" uid="uid://cvuwe3hux3g8s" path="res://ENV/interactable.gd" id="3_yh3jj"]
 [ext_resource type="Script" uid="uid://dbshy5vsa5d1u" path="res://camera_interact.gd" id="4_e3ne0"]
+[ext_resource type="Script" uid="uid://cm8ln7ov15b25" path="res://addons/godot_retro/effects/compositor/color_correction_effect.gd" id="7_bswpg"]
 [ext_resource type="Script" uid="uid://c005168h7m23y" path="res://addons/button_prompts_for_godot/Scripts/ui_button_prompt.gd" id="7_d6cxa"]
 [ext_resource type="PackedScene" path="res://feed/food_item.tscn" id="10_feed"]
 [ext_resource type="PackedScene" path="res://feed/landlord_npc.tscn" id="11_feed"]
+[ext_resource type="Script" uid="uid://ckx7nbcgd8mlc" path="res://addons/godot_retro/effects/compositor/grain_complex_effect.gd" id="8_eiu7c"]
+[ext_resource type="Script" uid="uid://c1ymm28l832qf" path="res://scripts/door_portal.gd" id="8_ogfck"]
+[ext_resource type="Script" uid="uid://dofs2m1oinl5d" path="res://scripts/interactable.gd" id="9_as1ev"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_ixvud"]
 margin = 0.0
@@ -25,7 +29,7 @@ size = Vector3(2, 1, 2.48)
 size = Vector3(25, 5, 0.18)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_78qxj"]
-size = Vector3(0.2, 5, 2)
+size = Vector3(0.2, 5, 5.75)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_pkerd"]
 size = Vector3(0.5, 5, 8)
@@ -96,6 +100,9 @@ size = Vector3(1, 1, 2)
 [sub_resource type="BoxShape3D" id="BoxShape3D_575hj"]
 size = Vector3(2, 1.3155518, 1.1293945)
 
+[sub_resource type="BoxShape3D" id="BoxShape3D_s0w8p"]
+size = Vector3(1, 2, 0.2)
+
 [sub_resource type="Environment" id="Environment_q2xc8"]
 background_mode = 1
 background_color = Color(0.039215688, 0.047058824, 0.0627451, 1)
@@ -105,12 +112,39 @@ ambient_light_energy = 0.3
 tonemap_exposure = 0.8
 fog_enabled = true
 fog_mode = 1
-fog_light_color = Color(0.43529412, 0.48235294, 0.53333336, 1)
+fog_light_color = Color(0.397331, 0.42623207, 0.6136144, 1)
 fog_density = 1.0
 fog_sky_affect = 0.7
-fog_depth_curve = 1.8025026
+fog_depth_curve = 0.96593714
 fog_depth_begin = 3.0
 fog_depth_end = 35.0
+
+[sub_resource type="CompositorEffect" id="CompositorEffect_as1ev"]
+resource_local_to_scene = false
+resource_name = ""
+enabled = true
+effect_callback_type = 4
+needs_motion_vectors = false
+needs_normal_roughness = false
+script = ExtResource("7_bswpg")
+metadata/_custom_type_script = "uid://cm8ln7ov15b25"
+
+[sub_resource type="CompositorEffect" id="CompositorEffect_bswpg"]
+resource_local_to_scene = false
+resource_name = ""
+enabled = true
+effect_callback_type = 4
+needs_motion_vectors = false
+needs_normal_roughness = false
+script = ExtResource("8_eiu7c")
+grain_size = 1.2
+metadata/_custom_type_script = "uid://ckx7nbcgd8mlc"
+
+[sub_resource type="Compositor" id="Compositor_ogfck"]
+compositor_effects = Array[CompositorEffect]([SubResource("CompositorEffect_as1ev"), SubResource("CompositorEffect_bswpg")])
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_8ujnh"]
+size = Vector3(0.5, 2, 1)
 
 [node name="Node3D" type="Node3D" unique_id=307811651]
 script = ExtResource("1_aiue8")
@@ -143,10 +177,10 @@ shape = SubResource("CapsuleShape3D_ixvud")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3, 0)
 
 [node name="Camera3D" type="Camera3D" parent="PSXScreen/SubViewport/World/Player" unique_id=645933238 node_paths=PackedStringArray("prompt_label")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 current = true
 script = ExtResource("4_e3ne0")
-prompt_label = NodePath("../../../../../PromptLabel")
+prompt_label = NodePath("../../../../../CanvasLayer/PromptLabel")
 
 [node name="Home_Collision" type="StaticBody3D" parent="PSXScreen/SubViewport/World" unique_id=1501201991]
 
@@ -164,6 +198,10 @@ shape = SubResource("BoxShape3D_vdbkr")
 
 [node name="coll_wall_right" type="CollisionShape3D" parent="PSXScreen/SubViewport/World/Home_Collision" unique_id=1683821147]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.0193539, 1.2037963, -4.00165)
+shape = SubResource("BoxShape3D_78qxj")
+
+[node name="coll_wall_right5" type="CollisionShape3D" parent="PSXScreen/SubViewport/World/Home_Collision" unique_id=1021438254]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.025457501, 1.2037963, -5.8867793)
 shape = SubResource("BoxShape3D_78qxj")
 
 [node name="coll_wall_right2" type="CollisionShape3D" parent="PSXScreen/SubViewport/World/Home_Collision" unique_id=43124098]
@@ -258,6 +296,22 @@ shape = SubResource("BoxShape3D_4p3m7")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.016342, 0.17723125, -10.521216)
 shape = SubResource("BoxShape3D_575hj")
 
+[node name="coll_door" type="CollisionShape3D" parent="PSXScreen/SubViewport/World/Home_Collision" unique_id=91162457]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.5119743, 0.98267645, -3.0134492)
+shape = SubResource("BoxShape3D_s0w8p")
+
+[node name="coll_door2" type="CollisionShape3D" parent="PSXScreen/SubViewport/World/Home_Collision" unique_id=2042784979]
+transform = Transform3D(-4.3711385e-08, 0, -0.99999994, 0, 1, 0, 0.99999994, 0, -4.3711385e-08, -2.9657297, 0.98267645, -5.4939413)
+shape = SubResource("BoxShape3D_s0w8p")
+
+[node name="coll_door3" type="CollisionShape3D" parent="PSXScreen/SubViewport/World/Home_Collision" unique_id=148706945]
+transform = Transform3D(-4.3711385e-08, 0, -0.99999994, 0, 1, 0, 0.99999994, 0, -4.3711385e-08, -10.987306, 0.98267645, -4.8939357)
+shape = SubResource("BoxShape3D_s0w8p")
+
+[node name="coll_door4" type="CollisionShape3D" parent="PSXScreen/SubViewport/World/Home_Collision" unique_id=120797639]
+transform = Transform3D(0.99999994, 0, 0, 0, 1, 0, 0, 0, 0.99999994, -1.5353537, 0.98267645, -11.992825)
+shape = SubResource("BoxShape3D_s0w8p")
+
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="PSXScreen/SubViewport/World" unique_id=2140103070]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.1965085, 1.187312, 0)
 light_color = Color(0.2998779, 0.7007453, 0.76508814, 1)
@@ -270,6 +324,7 @@ script = ExtResource("3_yh3jj")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="PSXScreen/SubViewport/World" unique_id=1978967886]
 environment = SubResource("Environment_q2xc8")
+compositor = SubResource("Compositor_ogfck")
 
 [node name="LandlordNPC" parent="PSXScreen/SubViewport/World" unique_id=1383895520 instance=ExtResource("11_feed")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.2, 1.06, -2.4)
@@ -283,28 +338,199 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.45, 1.21, -1.5)
 [node name="FoodItem3" parent="PSXScreen/SubViewport/World" unique_id=384843666 instance=ExtResource("10_feed")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.97, 1.2, -2.5)
 
-[node name="PromptLabel" type="Label" parent="." unique_id=1814303972]
-offset_right = 40.0
-offset_bottom = 23.0
+[node name="DoorTrigger" type="Node3D" parent="PSXScreen/SubViewport/World" unique_id=1612357828 node_paths=PackedStringArray("player_node", "marker_a", "marker_b")]
+script = ExtResource("8_ogfck")
+player_node = NodePath("../Player")
+marker_a = NodePath("Spawn_Home")
+marker_b = NodePath("Spawn_Room2")
+
+[node name="SideA" type="Area3D" parent="PSXScreen/SubViewport/World/DoorTrigger" unique_id=457955654]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.0543613, 1.0176058, -2.8991058)
+script = ExtResource("9_as1ev")
+action_text = "开门"
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="PSXScreen/SubViewport/World/DoorTrigger/SideA" unique_id=755296207]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.43429565, -0.012480617, 0.25210905)
+shape = SubResource("BoxShape3D_8ujnh")
+metadata/_edit_group_ = true
+
+[node name="SideB" type="Area3D" parent="PSXScreen/SubViewport/World/DoorTrigger" unique_id=457955655]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.503481, 1, -3.6233928)
+script = ExtResource("9_as1ev")
+action_text = "开门"
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="PSXScreen/SubViewport/World/DoorTrigger/SideB" unique_id=457955657]
+shape = SubResource("BoxShape3D_8ujnh")
+
+[node name="Spawn_Home" type="Marker3D" parent="PSXScreen/SubViewport/World/DoorTrigger" unique_id=457955656]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.5, 1.2, -2.4)
+
+[node name="Spawn_Room2" type="Marker3D" parent="PSXScreen/SubViewport/World/DoorTrigger" unique_id=1830949760]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.503481, 1.2, -4.254258)
+
+[node name="DoorTrigger_2" type="Node3D" parent="PSXScreen/SubViewport/World" unique_id=279361794 node_paths=PackedStringArray("player_node", "marker_a", "marker_b")]
+script = ExtResource("8_ogfck")
+player_node = NodePath("../Player")
+marker_a = NodePath("Spawn_Home")
+marker_b = NodePath("Spawn_Room2")
+
+[node name="SideA" type="Area3D" parent="PSXScreen/SubViewport/World/DoorTrigger_2" unique_id=977355802]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.577333, 1.0176058, -5.7391324)
+script = ExtResource("9_as1ev")
+action_text = "开门"
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="PSXScreen/SubViewport/World/DoorTrigger_2/SideA" unique_id=900854992]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.78738475, -0.012480617, 0.25210905)
+shape = SubResource("BoxShape3D_8ujnh")
+metadata/_edit_group_ = true
+
+[node name="SideB" type="Area3D" parent="PSXScreen/SubViewport/World/DoorTrigger_2" unique_id=401430652]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.9732637, 1, -5.468273)
+script = ExtResource("9_as1ev")
+action_text = "开门"
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="PSXScreen/SubViewport/World/DoorTrigger_2/SideB" unique_id=1180870072]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.33376956, 0, 0)
+shape = SubResource("BoxShape3D_8ujnh")
+
+[node name="Spawn_Home" type="Marker3D" parent="PSXScreen/SubViewport/World/DoorTrigger_2" unique_id=1339890333]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.1880064, 0.8617271, -5.5389805)
+
+[node name="Spawn_Room2" type="Marker3D" parent="PSXScreen/SubViewport/World/DoorTrigger_2" unique_id=1952723282]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.033917, 1.2, -5.4331985)
+
+[node name="DoorTrigger_3" type="Node3D" parent="PSXScreen/SubViewport/World" unique_id=2126094652 node_paths=PackedStringArray("player_node", "marker_a", "marker_b")]
+script = ExtResource("8_ogfck")
+player_node = NodePath("../Player")
+marker_a = NodePath("Spawn_Home")
+marker_b = NodePath("Spawn_Room2")
+
+[node name="SideA" type="Area3D" parent="PSXScreen/SubViewport/World/DoorTrigger_3" unique_id=558994713]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.4995625, 1.0176058, -12.272518)
+script = ExtResource("9_as1ev")
+action_text = "开门"
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="PSXScreen/SubViewport/World/DoorTrigger_3/SideA" unique_id=420175463]
+shape = SubResource("BoxShape3D_8ujnh")
+metadata/_edit_group_ = true
+
+[node name="SideB" type="Area3D" parent="PSXScreen/SubViewport/World/DoorTrigger_3" unique_id=1521690962]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.478425, 1, -11.61359)
+script = ExtResource("9_as1ev")
+action_text = "开门"
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="PSXScreen/SubViewport/World/DoorTrigger_3/SideB" unique_id=604392236]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.11754799)
+shape = SubResource("BoxShape3D_8ujnh")
+
+[node name="Spawn_Home" type="Marker3D" parent="PSXScreen/SubViewport/World/DoorTrigger_3" unique_id=1071542483]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.490507, 1.2, -12.866704)
+
+[node name="Spawn_Room2" type="Marker3D" parent="PSXScreen/SubViewport/World/DoorTrigger_3" unique_id=222580529]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.5962791, 1.2, -11.151035)
+
+[node name="OmniLight3D" type="OmniLight3D" parent="PSXScreen/SubViewport/World" unique_id=939260634]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.6495763, 1.3247709, -0.11781806)
+light_color = Color(0.5435585, 0.6022511, 0.58838475, 1)
+light_energy = 1.138
+light_indirect_energy = 0.0
+light_volumetric_fog_energy = 0.0
+light_specular = 0.336
+omni_range = 2.065
+omni_attenuation = 6.18
+
+[node name="OmniLight3D2" type="OmniLight3D" parent="PSXScreen/SubViewport/World" unique_id=258662819]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.9564292, 1.3719349, 1.6300035)
+light_color = Color(0.091652356, 0.26224473, 0.3607072, 1)
+light_energy = 0.03
+light_indirect_energy = 0.0
+light_volumetric_fog_energy = 0.0
+light_specular = 0.336
+omni_range = 0.897
+omni_attenuation = 5.94
+
+[node name="OmniLight3D3" type="OmniLight3D" parent="PSXScreen/SubViewport/World" unique_id=331179176]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.9565527, 1.3157067, 1.0598327)
+light_color = Color(0.091652356, 0.26224473, 0.3607072, 1)
+light_energy = 0.03
+light_indirect_energy = 0.0
+light_volumetric_fog_energy = 0.0
+light_specular = 0.336
+omni_range = 0.476
+omni_attenuation = 6.379
+
+[node name="OmniLight3D4" type="OmniLight3D" parent="PSXScreen/SubViewport/World" unique_id=1528923033]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.978569, 0.9072305, -8.535206)
+light_energy = 0.548
+light_indirect_energy = 0.0
+light_volumetric_fog_energy = 0.0
+light_specular = 0.336
+omni_range = 3.48
+omni_attenuation = 0.146
+
+[node name="OmniLight3D7" type="OmniLight3D" parent="PSXScreen/SubViewport/World" unique_id=922174299]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.2899016, 1.3940152, -6.0962324)
+light_color = Color(0.5672124, 0.2941798, 1, 1)
+light_energy = 1.746
+light_indirect_energy = 0.0
+light_volumetric_fog_energy = 0.0
+light_specular = 0.336
+omni_range = 1.404
+omni_attenuation = 1.637
+
+[node name="OmniLight3D8" type="OmniLight3D" parent="PSXScreen/SubViewport/World" unique_id=1153795550]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.6350316, 1.5025141, -14.2973175)
+light_color = Color(0.5672124, 0.2941798, 1, 1)
+light_energy = 1.746
+light_indirect_energy = 0.0
+light_volumetric_fog_energy = 0.0
+light_specular = 0.336
+omni_range = 1.404
+omni_attenuation = 1.637
+
+[node name="OmniLight3D9" type="OmniLight3D" parent="PSXScreen/SubViewport/World" unique_id=1541470831]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.42831302, 1.6292286, -10.793425)
+light_color = Color(0.5672124, 0.2941798, 1, 1)
+light_energy = 0.085
+light_indirect_energy = 0.0
+light_volumetric_fog_energy = 0.0
+light_specular = 0.336
+omni_range = 1.404
+omni_attenuation = 1.637
+
+[node name="OmniLight3D5" type="OmniLight3D" parent="PSXScreen/SubViewport/World" unique_id=1099050460]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.2971916, 1.4205592, -12.879458)
+light_color = Color(0.7971059, 0.6537084, 0.42841664, 1)
+light_energy = 0.884
+light_indirect_energy = 0.0
+light_volumetric_fog_energy = 0.0
+light_size = 1.0
+light_specular = 0.336
+omni_range = 1.287
+omni_attenuation = 1.374
+
+[node name="OmniLight3D6" type="OmniLight3D" parent="PSXScreen/SubViewport/World" unique_id=1733216681]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.1402297, 1.6787908, -14.753739)
+light_color = Color(0.43554693, 0.73780787, 0.7560348, 1)
+light_energy = 1.18
+light_indirect_energy = 0.0
+light_volumetric_fog_energy = 0.0
+light_specular = 0.336
+omni_range = 1.271
+omni_attenuation = 4.308
 
 [node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=549070373]
 
-[node name="UIRoot" type="Control" parent="CanvasLayer" unique_id=931779178]
-layout_mode = 3
-anchors_preset = 0
-offset_right = 1920.0
-offset_bottom = 1080.0
-
-[node name="ButtonPromptLabel" type="RichTextLabel" parent="CanvasLayer/UIRoot" unique_id=1328867940 groups=["prompt_label"]]
-layout_mode = 1
-anchors_preset = 12
+[node name="ButtonPromptLabel" type="RichTextLabel" parent="CanvasLayer" unique_id=1328867940 groups=["prompt_label"]]
+anchors_preset = 2
 anchor_top = 1.0
-anchor_right = 1.0
 anchor_bottom = 1.0
-offset_top = -80.0
-offset_bottom = -20.0
-grow_horizontal = 2
+offset_left = 15.0
+offset_top = -107.0
+offset_right = 597.0
+offset_bottom = -17.0
 grow_vertical = 0
+theme_override_font_sizes/normal_font_size = 30
 bbcode_enabled = true
 fit_content = true
 scroll_active = false
@@ -313,3 +539,8 @@ horizontal_alignment = 1
 vertical_alignment = 1
 script = ExtResource("7_d6cxa")
 metadata/_custom_type_script = "uid://c005168h7m23y"
+
+[node name="PromptLabel" type="Label" parent="CanvasLayer" unique_id=1814303972]
+visible = false
+offset_right = 160.0
+offset_bottom = 30.0
