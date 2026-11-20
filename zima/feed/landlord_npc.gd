@@ -1,40 +1,78 @@
 class_name FeedLandlordNPC
 extends StaticBody3D
 
-## 房东 NPC（占位长方体，后续由美术替换正式模型，占位高度已对齐相机视线）。
-## 职责边界（重要）：
-##   - 本脚本【不做任何输入轮询】。左键交付由 camera_interact.gd 统一仲裁后
-##     调用 try_deliver()，与食物拾取互斥（一次点击只发生一个动作）。
-##   - 房东不属于 feed_food 组，永远不会被"拾取"。
-## 功能：
-##   靠近 + 手持食物 → 底部提示「[鼠标左键] 交给房东」，左键交付
-##   shout() → 台词以红色大字浮现在玩家屏幕中上方
-## 后续「没按时喂食/偷拿物品」的触发逻辑只需调用 shout() / shout_random_line()。
+## 房东 = 渔夫本体。三段流程：
+##   1) 先把玩家手里的刀、斧头哄骗着收走（一开始语气很好）
+##   2) 收齐后进入喂食阶段，玩家交付食物
+##   3) 拖延 / 偷吃越多，语气越凶，最后露本性
+## 本脚本【不轮询输入】：左键交付由 camera_interact.gd 统一仲裁后调用 try_deliver()。
+
+const PHASE_ASK := 0
+const PHASE_FEED := 1
 
 @export var display_name := "房东"
-## 威胁/催促台词池，超时触发时随机抽一条
-@export var shout_lines: Array[String] = [
-	"快点送来！",
-	"别以为我没发现……把东西交出来！",
-	"今晚之前，我要看到它！",
-	"你最好想清楚后果！",
+
+@export_group("流程")
+## 当前阶段，检查器里可以直接切（0 收刀 / 1 喂食）
+@export_enum("收刀阶段:0", "喂食阶段:1") var phase := 0
+## 需要上交的刀具/斧头数量，场景里放几把就填几
+@export var required_weapons := 2
+## 喂食阶段多久没吃到东西就催一次（秒），<= 0 关掉
+@export var nag_interval := 45.0
+## 压力值到这个数就彻底露本性（偷吃 +1、每次催促 +1）
+@export var menacing_threshold := 3
+
+@export_group("台词 · 收刀阶段")
+@export var ask_weapon_lines: Array[String] = [
+	"乖，把刀放我这儿，厨房里不该有这东西。",
+	"斧头也交出来吧，省得你半夜把自己伤着。",
+	"我替你收着，等你乖了，再还给你。",
 ]
-## 收到食物时说的台词（留空则不喊）
-@export var thanks_line := "这才像话……别让我等下一次！"
+@export var weapon_thanks_lines: Array[String] = [
+	"对，就这样。",
+	"乖孩子。",
+	"这才听话。",
+]
+@export var reject_food_line := "先把手上的东西都交上来，再谈吃的。"
+@export var phase_up_line := "好了，刀都在我这儿了……现在，我饿了。"
+@export var steal_in_ask_line := "……你刚才，是不是偷吃了？先把刀交出来。"
+
+@export_group("台词 · 喂食阶段")
+@export var food_gentle_lines: Array[String] = [
+	"……谢谢。放这儿吧。",
+	"嗯，今天还算准时。",
+]
+@export var food_impatient_lines: Array[String] = [
+	"你看我像有耐心的样子吗？",
+	"我数三下。",
+	"别让我站起来。",
+]
+@export var food_menacing_lines: Array[String] = [
+	"我忍你很久了。",
+	"再磨一次，你就不用喂了。",
+	"你猜，我把你的刀收在哪儿？",
+]
 
 @export_group("外观与动画")
-## 房东本体模型（渔夫 drowned_oilskin.glb 的实例）
+## 房东本体模型（渔夫 drowned_oilskin.glb 实例）
 @export var model: Node3D
-## 模型的动画播放器
+## 模型动画播放器
 @export var animation_player: AnimationPlayer
-## 平时循环播放的待机动画
+## 待机循环动画
 @export var idle_animation: StringName = &"Idle"
-## 吃到食物时播一次的动作（包里没有进食动画，暂用 Attack 当啃咬）
+## 吃东西时播一次（包里没有进食动作，暂用 Attack 当啃咬）
 @export var eat_animation: StringName = &"Attack"
-## 玩家偷吃时播一次的生气动作
+## 生气/被偷吃时播一次
 @export var angry_animation: StringName = &"Retch"
 
+var weapons_given := 0
+var food_given := 0
+var pressure := 0
+
+var _nag_left := 0.0
+var _ask_cooldown := 0.0
 var _player_near := false
+
 @onready var _prompt_id := "landlord_%d" % get_instance_id()
 @onready var _zone: Area3D = $PickupZone
 
@@ -46,42 +84,173 @@ func _ready() -> void:
 	_play_loop(idle_animation)
 
 
-func _on_zone_entered(body: Node3D) -> void:
-	if body is CharacterBody3D:
-		_player_near = true
+func _process(delta: float) -> void:
+	if _ask_cooldown > 0.0:
+		_ask_cooldown -= delta
+	_tick_nag(delta)
 
-
-func _on_zone_exited(body: Node3D) -> void:
-	if body is CharacterBody3D:
-		_player_near = false
-		NearPrompt.hide_prompt(_prompt_id)
-
-
-func _process(_delta: float) -> void:
-	# 只负责靠近提示（何时交付由相机仲裁）
-	if _player_near and _get_carried_food() != null:
+	if _player_near and _get_carried() != null:
 		NearPrompt.show_prompt(_prompt_id, "[鼠标左键] 交给%s" % display_name)
 	else:
 		NearPrompt.hide_prompt(_prompt_id)
 
 
-## 供相机仲裁查询：玩家是否在本房东感应区内
+func _tick_nag(delta: float) -> void:
+	if phase != PHASE_FEED or nag_interval <= 0.0:
+		return
+	_nag_left += delta
+	if _nag_left < nag_interval:
+		return
+	_nag_left = 0.0
+	pressure += 1
+	shout(_pick(_tone_lines()))
+
+
+func _on_zone_entered(body: Node3D) -> void:
+	if not (body is CharacterBody3D):
+		return
+	_player_near = true
+	if phase == PHASE_ASK and _ask_cooldown <= 0.0:
+		_ask_cooldown = 10.0
+		shout(_pick(ask_weapon_lines))
+
+
+func _on_zone_exited(body: Node3D) -> void:
+	if not (body is CharacterBody3D):
+		return
+	_player_near = false
+	NearPrompt.hide_prompt(_prompt_id)
+
+
+## 供相机仲裁查询：玩家是否在感应区内
 func is_player_near() -> bool:
 	return _player_near
 
 
-## 由相机仲裁调用：把手持食物交给房东。成功返回 true。
+## 由相机仲裁调用：交付手持物。成功返回 true。
 func try_deliver() -> bool:
 	if not _player_near:
 		return false
-	var food := _get_carried_food()
-	if food == null:
+	var item := _get_carried()
+	if item == null:
 		return false
-	_receive_food(food)
-	return true
+
+	if item.is_in_group("feed_weapon"):
+		_receive_weapon(item)
+		return true
+
+	if item.is_in_group("feed_food"):
+		if phase == PHASE_ASK:
+			shout(reject_food_line)
+			return false
+		_receive_food(item)
+		return true
+
+	return false
 
 
-func _get_carried_food() -> Node3D:
+func _receive_weapon(item: Node3D) -> void:
+	_take_carried()
+	weapons_given += 1
+	MessageBanner.show_message(
+		"你把%s交给了%s。" % [_item_name(item), display_name],
+		Color(0.55, 0.9, 1.0))
+	shout(_pick(weapon_thanks_lines))
+	item.queue_free()
+
+	if phase == PHASE_ASK and weapons_given >= required_weapons:
+		phase = PHASE_FEED
+		weapons_given = 0
+		_nag_left = 0.0
+		MessageBanner.show_message(
+			"%s：%s" % [display_name, phase_up_line],
+			Color(1.0, 0.28, 0.22), 3.0)
+
+
+func _receive_food(food: Node3D) -> void:
+	_take_carried()
+	food_given += 1
+	_nag_left = 0.0
+	MessageBanner.show_message(
+		"你把食物交给了%s。" % display_name,
+		Color(0.55, 0.9, 1.0))
+	MonsterWatch.on_food_delivered()
+	_play_once(eat_animation)
+	shout(_pick(_tone_lines()))
+	food.queue_free()
+
+
+## 玩家偷吃被听见：涨压力、转头、干呕一下、骂一句
+func react_angry() -> void:
+	pressure += 1
+	_face_player()
+	_play_once(angry_animation)
+	if phase == PHASE_ASK:
+		shout(steal_in_ask_line)
+	else:
+		shout(_pick(_tone_lines()))
+
+
+## 对准房东按 E：说一句当前该说的话
+func interact() -> void:
+	if phase == PHASE_ASK:
+		shout(_pick(ask_weapon_lines))
+	else:
+		shout(_pick(_tone_lines()))
+
+
+func shout(text: String = "") -> void:
+	if text.is_empty():
+		text = _pick(_tone_lines())
+	MessageBanner.show_message(
+		"%s：%s" % [display_name, text],
+		Color(1.0, 0.28, 0.22), 3.0)
+
+
+func shout_random_line() -> String:
+	return _pick(_tone_lines())
+
+
+# ---- 内部工具 ----
+
+## 0 = 还好声好气，1 = 不耐烦，2 = 露本性
+func _tone() -> int:
+	if pressure >= menacing_threshold:
+		return 2
+	if pressure > 0 or food_given >= 2:
+		return 1
+	return 0
+
+
+func _tone_lines() -> Array[String]:
+	match _tone():
+		2:
+			return food_menacing_lines
+		1:
+			return food_impatient_lines
+		_:
+			return food_gentle_lines
+
+
+func _pick(lines: Array[String]) -> String:
+	return lines.pick_random() if not lines.is_empty() else "……"
+
+
+func _item_name(item: Node) -> String:
+	return item.item_name if "item_name" in item else "东西"
+
+
+func _face_player() -> void:
+	var player := get_tree().get_first_node_in_group(&"player")
+	if player == null:
+		return
+	var flat: Vector3 = player.global_position - global_position
+	flat.y = 0.0
+	if flat.length() < 0.01:
+		return
+	rotation = Vector3(0, atan2(flat.x, flat.z), 0)
+
+func _get_carried() -> Node3D:
 	var cam := get_viewport().get_camera_3d()
 	if cam == null:
 		return null
@@ -89,32 +258,11 @@ func _get_carried_food() -> Node3D:
 	return item if item != null else null
 
 
-func _receive_food(food: Node3D) -> void:
+func _take_carried() -> void:
 	var cam := get_viewport().get_camera_3d()
-	cam.set("carried_item", null)
+	if cam != null:
+		cam.set("carried_item", null)
 	NearPrompt.hide_prompt(_prompt_id)
-	MessageBanner.show_message("你把食物交给了%s。" % display_name, Color(0.55, 0.9, 1.0))
-	MonsterWatch.on_food_delivered()
-	_play_once(eat_animation)
-	if not thanks_line.is_empty():
-		shout(thanks_line)
-	food.queue_free()
-
-
-func shout(text: String = "") -> void:
-	if text.is_empty():
-		text = shout_random_line()
-	MessageBanner.show_message("%s：%s" % [display_name, text], Color(1.0, 0.28, 0.22), 3.0)
-
-
-func shout_random_line() -> String:
-	return shout_lines.pick_random() if not shout_lines.is_empty() else "……"
-
-
-## 玩家偷吃被听见：生一次气 + 骂一句
-func react_angry() -> void:
-	_play_once(angry_animation)
-	shout()
 
 
 ## 循环播放一个动画（待机用）
@@ -136,7 +284,3 @@ func _play_once(anim: StringName) -> void:
 	await animation_player.animation_finished
 	_play_loop(idle_animation)
 
-
-## 供相机 [E] 键测试：对准房东按 E 会随机喊一句
-func interact() -> void:
-	shout()

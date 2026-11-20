@@ -96,9 +96,11 @@ func _update_raycast_and_prompt() -> void:
 
 func _build_prompt() -> String:
 	if carried_item:
+		if carried_item.is_in_group("feed_weapon"):
+			return "[鼠标左键] 交给房东"
 		var display_name: String = carried_item.item_name if "item_name" in carried_item else "物品"
 		return "[右键] 吃掉 %s" % display_name
-	if hit_target and hit_target.is_in_group("feed_food"):
+	if hit_target and (hit_target.is_in_group("feed_food") or hit_target.is_in_group("feed_weapon")):
 		return "[鼠标左键] 拾取"
 	if hit_target and hit_target.has_method("interact"):
 		return "[E] 查看"
@@ -121,13 +123,16 @@ func _handle_interactions() -> void:
 					break
 		# 2) 空手且靠近食物 → 拾取（找最近的近处食物）
 		if not acted and carried_item == null:
-			var food := _nearest_near("feed_food", 1)
-			if not food.is_empty() and food[0].has_method("pick_up"):
-				try_pick_up(food[0])
+			var item := _nearest_near_any([&"feed_food", &"feed_weapon"], 1)
+			if not item.is_empty() and item[0].has_method("pick_up"):
+				try_pick_up(item[0])
 	# ---- 右键：手上有食物就吃，没有就提示怎么拿 ----
 	if Input.is_action_just_pressed("consume"):
 		if carried_item != null:
-			_consume_carried()
+			if carried_item.is_in_group("feed_food"):
+				_consume_carried()
+			else:
+				MessageBanner.show_message("这东西不能吃。", Color(0.85, 0.85, 0.85), 1.5)
 		else:
 			MessageBanner.show_message(
 				"手上没有食物——先走近食物，按鼠标左键拿起。",
@@ -136,10 +141,17 @@ func _handle_interactions() -> void:
 
 ## 在 group 组里找出「玩家在感应区内」的节点，按距离从近到远排序取前 count 个
 func _nearest_near(group: String, count: int) -> Array:
+	return _nearest_near_any([group], count)
+
+
+## 同上，但一次扫多个组（食物 + 刀具）
+func _nearest_near_any(groups: Array, count: int) -> Array:
 	var candidates: Array = []
-	for n in get_tree().get_nodes_in_group(group):
-		if n.has_method("is_player_near") and n.is_player_near():
-			candidates.append(n)
+	for group in groups:
+		for n in get_tree().get_nodes_in_group(group):
+			if n.has_method("is_player_near") and n.is_player_near():
+				if not candidates.has(n):
+					candidates.append(n)
 	candidates.sort_custom(func(a, b):
 		return global_position.distance_to(a.global_position) < global_position.distance_to(b.global_position))
 	return candidates.slice(0, count)
