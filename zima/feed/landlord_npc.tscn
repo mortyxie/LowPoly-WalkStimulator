@@ -1,0 +1,30 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://feed/landlord_npc.gd" id="1_npc"]
+
+[sub_resource type="BoxShape3D" id="NpcShape"]
+size = Vector3(0.8, 2.05, 0.5)
+
+[sub_resource type="StandardMaterial3D" id="NpcMat"]
+albedo_color = Color(0.55, 0.2, 0.85, 1)
+
+[sub_resource type="BoxMesh" id="NpcMesh"]
+material = SubResource("NpcMat")
+size = Vector3(0.8, 2.05, 0.5)
+
+[sub_resource type="SphereShape3D" id="ZoneShape"]
+radius = 2.0
+
+[node name="LandlordNPC" type="StaticBody3D"]
+script = ExtResource("1_npc")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("NpcShape")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+mesh = SubResource("NpcMesh")
+
+[node name="PickupZone" type="Area3D" parent="."]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="PickupZone"]
+shape = SubResource("ZoneShape")

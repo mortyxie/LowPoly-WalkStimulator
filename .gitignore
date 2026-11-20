@@ -1,3 +1,7 @@
+# WorkBuddy temporary/project files
+.workbuddy/
+
+
 # Godot 4.2+ specific ignores
 ~*.dll
 

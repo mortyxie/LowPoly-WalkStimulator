@@ -1,5 +1,7 @@
 extends CharacterBody3D
 
+## 只负责移动（WASD/跳跃/重力）。鼠标视角由相机上的 camera_interact.gd 持有。
+
 @export_group("Movement")
 @export var speed := 5.0
 @export var jump_velocity := 6.0
@@ -7,27 +9,7 @@ extends CharacterBody3D
 @export var air_acceleration := 0.5
 @export var gravity := 15.0
 
-@export_group("Look")
-@export var mouse_sensitivity := 3.0
-@export var pitch_limit := 89.0
-
-@export_group("Nodes")
-@export var camera_pivot_path: NodePath = ^"CameraPivot2"
-
-var camera_pivot: Node3D
-var _pitch := 0.0
-
-func _ready() -> void:
-	camera_pivot = get_node_or_null(camera_pivot_path)
-	if camera_pivot == null:
-		push_error("player: camera pivot not found")
-	MouseLook.set_captured(true)
-
 func _physics_process(delta: float) -> void:
-	if Input.is_action_just_pressed("ui_cancel"):
-		var captured := Input.get_mouse_mode() == Input.MOUSE_MODE_CAPTURED
-		MouseLook.set_captured(not captured)
-
 	if not is_on_floor():
 		velocity.y -= gravity * delta
 
@@ -43,13 +25,3 @@ func _physics_process(delta: float) -> void:
 	velocity.z = move_toward(velocity.z, target.z, accel * speed * delta)
 
 	move_and_slide()
-
-	var motion := MouseLook.take_motion()
-	rotate_y(-motion.x * mouse_sensitivity / 1000.0)
-	_pitch = clamp(
-		_pitch - motion.y * mouse_sensitivity / 1000.0,
-		deg_to_rad(-pitch_limit),
-		deg_to_rad(pitch_limit)
-	)
-	if camera_pivot:
-		camera_pivot.rotation.x = _pitch
