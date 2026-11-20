@@ -37,6 +37,9 @@ NearPrompt="*res://feed/near_prompt.gd"
 MonsterWatch="*res://feed/monster_watch.gd"
 DialogueManager="*res://addons/dialogue_manager/dialogue_manager.gd"
 
+[dialogue_manager]
+
+runtime/balloon_path="res://feed/psx_balloon.tscn"
 
 [display]
 

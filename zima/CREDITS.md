@@ -11,6 +11,10 @@
 
 ## 插件
 
+- **PS1 RPG Menu Kit Free** — PS1 风渐变窗口、菜单列表、对话框（`addons/ps1_rpg_menu`），
+  对话气球 `feed/psx_balloon.tscn` 用的就是它的 `dialogue_box` 与 `menu_list`。
+  PS1 RPG Menu Kit Free by heyheythere - https://heyheythere.itch.io/ps1-rpg-menu-kit-free - CC BY 4.0
+  授权全文见 `addons/ps1_rpg_menu/LICENSE.txt`
 - **Footstepper** — 脚步音效节点（`addons/footstepper`）
 - **Godot Retro** — CRT 后期 / 抖动（`addons/godot_retro`）
 - **Weather FX** — 天气效果（`addons/weather_fx`）
