@@ -34,6 +34,7 @@ MouseLook="*uid://i0xtt6yhk6tn"
 InputHelper="*uid://cholww48njaeh"
 MessageBanner="*res://feed/hud_banner.gd"
 NearPrompt="*res://feed/near_prompt.gd"
+MonsterWatch="*res://feed/monster_watch.gd"
 
 [display]
 
@@ -89,3 +90,16 @@ pickup={
 [rendering]
 
 rendering_device/driver.windows="d3d12"
+
+[importer_defaults]
+
+scene={
+"animation/fps": 30,
+"gltf/embedded_image_handling": 3,
+"meshes/generate_lods": false
+}
+texture={
+"compress/mode": 0,
+"detect_3d/compress_to": 0,
+"mipmaps/generate": false
+}

@@ -8,13 +8,14 @@
 [ext_resource type="Script" uid="uid://dbshy5vsa5d1u" path="res://camera_interact.gd" id="4_e3ne0"]
 [ext_resource type="Script" uid="uid://cm8ln7ov15b25" path="res://addons/godot_retro/effects/compositor/color_correction_effect.gd" id="7_bswpg"]
 [ext_resource type="Script" uid="uid://c005168h7m23y" path="res://addons/button_prompts_for_godot/Scripts/ui_button_prompt.gd" id="7_d6cxa"]
-[ext_resource type="PackedScene" path="res://feed/food_item.tscn" id="10_feed"]
-[ext_resource type="PackedScene" path="res://feed/landlord_npc.tscn" id="11_feed"]
 [ext_resource type="Script" uid="uid://ckx7nbcgd8mlc" path="res://addons/godot_retro/effects/compositor/grain_complex_effect.gd" id="8_eiu7c"]
 [ext_resource type="Script" uid="uid://c1ymm28l832qf" path="res://scripts/door_portal.gd" id="8_ogfck"]
 [ext_resource type="Script" uid="uid://dofs2m1oinl5d" path="res://scripts/interactable.gd" id="9_as1ev"]
+[ext_resource type="PackedScene" path="res://feed/food_item.tscn" id="10_feed"]
+[ext_resource type="PackedScene" path="res://feed/landlord_npc.tscn" id="11_feed"]
 [ext_resource type="Script" uid="uid://bfwyjcvtiew6d" path="res://addons/footstepper/footstepper.gd" id="12_foot"]
 [ext_resource type="Resource" uid="uid://236be04aq3fs" path="res://addons/footstepper/example-profiles/default_profile.tres" id="13_foot"]
+[ext_resource type="PackedScene" path="res://monsters/crab/crab.tscn" id="14_crab"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_ixvud"]
 margin = 0.0
@@ -169,7 +170,7 @@ render_target_update_mode = 4
 
 [node name="World" type="Node3D" parent="PSXScreen/SubViewport" unique_id=544367427]
 
-[node name="Player" parent="PSXScreen/SubViewport/World" unique_id=98517058 instance=ExtResource("3_e3ne0")]
+[node name="Player" parent="PSXScreen/SubViewport/World" unique_id=98517058 instance=ExtResource("3_e3ne0") groups=["player"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.65029204, 1.278375, 1.7793486)
 
 [node name="CollisionShape3D2" type="CollisionShape3D" parent="PSXScreen/SubViewport/World/Player" unique_id=1213214584]
@@ -187,7 +188,6 @@ prompt_label = NodePath("../../../../../CanvasLayer/PromptLabel")
 [node name="Footstepper" type="Node3D" parent="PSXScreen/SubViewport/World/Player" unique_id=1976534120]
 script = ExtResource("12_foot")
 footstep_distance = 1.8
-audio_number_of_players = 3
 default_sound_profile = ExtResource("13_foot")
 
 [node name="Home_Collision" type="StaticBody3D" parent="PSXScreen/SubViewport/World" unique_id=1501201991]
@@ -333,6 +333,11 @@ script = ExtResource("3_yh3jj")
 [node name="WorldEnvironment" type="WorldEnvironment" parent="PSXScreen/SubViewport/World" unique_id=1978967886]
 environment = SubResource("Environment_q2xc8")
 compositor = SubResource("Compositor_ogfck")
+
+[node name="GiantCrab" parent="PSXScreen/SubViewport/World" instance=ExtResource("14_crab") groups=["feed_monster"] unique_id=1720231456]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -12)
+active = false
+wander = false
 
 [node name="LandlordNPC" parent="PSXScreen/SubViewport/World" unique_id=1383895520 instance=ExtResource("11_feed")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.2, 1.06, -2.4)

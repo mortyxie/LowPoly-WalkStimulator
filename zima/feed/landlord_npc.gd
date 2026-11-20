@@ -81,6 +81,7 @@ func _receive_food(food: Node3D) -> void:
 	cam.set("carried_item", null)
 	NearPrompt.hide_prompt(_prompt_id)
 	MessageBanner.show_message("你把食物交给了%s。" % display_name, Color(0.55, 0.9, 1.0))
+	MonsterWatch.on_food_delivered()
 	if not thanks_line.is_empty():
 		shout(thanks_line)
 	food.queue_free()

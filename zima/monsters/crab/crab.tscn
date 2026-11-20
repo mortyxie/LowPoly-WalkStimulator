@@ -1,0 +1,66 @@
+[gd_scene load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://scripts/monster_brain.gd" id="1"]
+[ext_resource type="PackedScene" path="res://monsters/crab/crab_rust.glb" id="2"]
+[ext_resource type="Texture2D" path="res://monsters/crab/crab_rust.png" id="3"]
+[ext_resource type="Texture2D" path="res://monsters/crab/crab_bone.png" id="4"]
+
+[sub_resource type="CapsuleShape3D" id="body"]
+radius = 0.355
+height = 0.73
+
+[sub_resource type="BoxShape3D" id="hitbox"]
+size = Vector3(1.724, 0.669, 1.657)
+
+[node name="GiantCrab" type="CharacterBody3D" node_paths=PackedStringArray("animation_player", "model", "hitbox")]
+collision_layer = 4
+collision_mask = 7
+floor_snap_length = 0.3
+script = ExtResource("1")
+monster_name = "Giant Crab"
+eye_height = 0.63
+walk_speed = 0.62
+run_speed = 2.55
+walk_animation_speed = 0.62
+run_animation_speed = 2.55
+attack_range = 1.5
+attack_hit_time = 0.56
+attack2_range = 1.5
+attack2_hit_time = 0.66
+damage = 8.0
+max_health = 90.0
+animation_player = NodePath("Model/AnimationPlayer")
+anim_alert = &"Threat"
+idle_variations = PackedStringArray("Threat")
+skin_textures = {
+"rust": ExtResource("3"),
+"bone": ExtResource("4")
+}
+skin = "rust"
+model = NodePath("Model")
+hitbox = NodePath("Hitbox")
+
+[node name="Collision" type="CollisionShape3D" parent="."]
+transform = Transform3D(1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.365, 0.177)
+shape = SubResource("body")
+
+[node name="Hitbox" type="Area3D" parent="."]
+collision_layer = 4
+collision_mask = 0
+monitoring = false
+
+[node name="Shape" type="CollisionShape3D" parent="Hitbox"]
+transform = Transform3D(1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.372, 0.254)
+shape = SubResource("hitbox")
+
+[node name="Model" parent="." instance=ExtResource("2")]
+
+[node name="NavigationAgent3D" type="NavigationAgent3D" parent="."]
+path_desired_distance = 0.6
+target_desired_distance = 0.6
+path_height_offset = 0.0
+radius = 0.355
+height = 0.73
+avoidance_enabled = true
+neighbor_distance = 4.0
+max_neighbors = 8
