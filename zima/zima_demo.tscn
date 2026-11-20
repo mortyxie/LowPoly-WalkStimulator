@@ -13,6 +13,8 @@
 [ext_resource type="Script" uid="uid://ckx7nbcgd8mlc" path="res://addons/godot_retro/effects/compositor/grain_complex_effect.gd" id="8_eiu7c"]
 [ext_resource type="Script" uid="uid://c1ymm28l832qf" path="res://scripts/door_portal.gd" id="8_ogfck"]
 [ext_resource type="Script" uid="uid://dofs2m1oinl5d" path="res://scripts/interactable.gd" id="9_as1ev"]
+[ext_resource type="Script" uid="uid://bfwyjcvtiew6d" path="res://addons/footstepper/footstepper.gd" id="12_foot"]
+[ext_resource type="Resource" uid="uid://236be04aq3fs" path="res://addons/footstepper/example-profiles/default_profile.tres" id="13_foot"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_ixvud"]
 margin = 0.0
@@ -181,6 +183,12 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 current = true
 script = ExtResource("4_e3ne0")
 prompt_label = NodePath("../../../../../CanvasLayer/PromptLabel")
+
+[node name="Footstepper" type="Node3D" parent="PSXScreen/SubViewport/World/Player" unique_id=1976534120]
+script = ExtResource("12_foot")
+footstep_distance = 1.8
+audio_number_of_players = 3
+default_sound_profile = ExtResource("13_foot")
 
 [node name="Home_Collision" type="StaticBody3D" parent="PSXScreen/SubViewport/World" unique_id=1501201991]
 
