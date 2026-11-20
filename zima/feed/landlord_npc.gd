@@ -174,7 +174,9 @@ func _receive_food(food: Node3D) -> void:
 	MessageBanner.show_message(
 		"你把食物交给了%s。" % display_name,
 		Color(0.55, 0.9, 1.0))
-	MonsterWatch.on_food_delivered()
+	var watch := get_tree().root.get_node_or_null("/root/MonsterWatch")
+	if watch != null and watch.has_method(&"on_food_delivered"):
+		watch.call(&"on_food_delivered")
 	_play_once(eat_animation)
 	shout(_pick(_tone_lines()))
 	food.queue_free()

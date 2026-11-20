@@ -75,7 +75,9 @@ func pick_up(by: Node3D) -> void:
 ## 由相机调用：吃掉
 func consume() -> void:
 	MessageBanner.show_message(consume_text, Color(1.0, 0.82, 0.35))
-	MonsterWatch.on_player_ate(item_name)
+	var watch := get_tree().root.get_node_or_null("/root/MonsterWatch")
+	if watch != null and watch.has_method(&"on_player_ate"):
+		watch.call(&"on_player_ate", item_name)
 	queue_free()
 
 
