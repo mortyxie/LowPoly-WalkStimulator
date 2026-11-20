@@ -15,6 +15,8 @@
 [ext_resource type="PackedScene" path="res://feed/landlord_npc.tscn" id="11_feed"]
 [ext_resource type="Script" uid="uid://bfwyjcvtiew6d" path="res://addons/footstepper/footstepper.gd" id="12_foot"]
 [ext_resource type="Resource" uid="uid://236be04aq3fs" path="res://addons/footstepper/example-profiles/default_profile.tres" id="13_foot"]
+[ext_resource type="PackedScene" path="res://feed/weapon_knife.tscn" id="15_mvwe6"]
+[ext_resource type="PackedScene" path="res://feed/weapon_axe.tscn" id="16_mnu58"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_ixvud"]
 margin = 0.0
@@ -337,7 +339,7 @@ compositor = SubResource("Compositor_ogfck")
 transform = Transform3D(-0.037468128, 0, -1.474524, 0, 1.475, 0, 1.474524, 0, -0.037468128, 1.142246, -0.4358281, -6.169756)
 
 [node name="FoodItem1" parent="PSXScreen/SubViewport/World" unique_id=1054604878 instance=ExtResource("10_feed")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.85, 1.24, 1.29)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.4396873, 1.24, 1.1085807)
 
 [node name="FoodItem2" parent="PSXScreen/SubViewport/World" unique_id=1036715314 instance=ExtResource("10_feed")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.45, 1.21, -1.5)
@@ -453,7 +455,7 @@ light_energy = 0.03
 light_indirect_energy = 0.0
 light_volumetric_fog_energy = 0.0
 light_specular = 0.336
-omni_range = 0.897
+omni_range = 1.091
 omni_attenuation = 5.94
 
 [node name="OmniLight3D3" type="OmniLight3D" parent="PSXScreen/SubViewport/World" unique_id=331179176]
@@ -463,7 +465,7 @@ light_energy = 0.03
 light_indirect_energy = 0.0
 light_volumetric_fog_energy = 0.0
 light_specular = 0.336
-omni_range = 0.476
+omni_range = 1.26
 omni_attenuation = 6.379
 
 [node name="OmniLight3D4" type="OmniLight3D" parent="PSXScreen/SubViewport/World" unique_id=1528923033]
@@ -486,9 +488,9 @@ omni_range = 1.404
 omni_attenuation = 1.637
 
 [node name="OmniLight3D8" type="OmniLight3D" parent="PSXScreen/SubViewport/World" unique_id=1153795550]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.6350316, 1.5025141, -14.2973175)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.64871657, 1.5025141, -14.365057)
 light_color = Color(0.5672124, 0.2941798, 1, 1)
-light_energy = 1.746
+light_energy = 4.436
 light_indirect_energy = 0.0
 light_volumetric_fog_energy = 0.0
 light_specular = 0.336
@@ -517,7 +519,7 @@ omni_range = 1.287
 omni_attenuation = 1.374
 
 [node name="OmniLight3D6" type="OmniLight3D" parent="PSXScreen/SubViewport/World" unique_id=1733216681]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.1402297, 1.6787908, -14.753739)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.0897245, 1.4385589, -14.753739)
 light_color = Color(0.43554693, 0.73780787, 0.7560348, 1)
 light_energy = 1.18
 light_indirect_energy = 0.0
@@ -525,6 +527,12 @@ light_volumetric_fog_energy = 0.0
 light_specular = 0.336
 omni_range = 1.271
 omni_attenuation = 4.308
+
+[node name="WeaponKnife" parent="PSXScreen/SubViewport/World" unique_id=1825076678 instance=ExtResource("15_mvwe6")]
+transform = Transform3D(-0.372677, 0.920766, -0.115335, -0.245709, 0.021938, 0.969095, 0.89484, 0.389499, 0.218065, -6.933952, 1.130707, -14.14209)
+
+[node name="WeaponAxe" parent="PSXScreen/SubViewport/World" unique_id=317770798 instance=ExtResource("16_mnu58")]
+transform = Transform3D(-0.2022874, 0.861176, 0.4663217, -0.93103665, -0.31678927, 0.18115027, 0.30372795, -0.3975182, 0.865869, 0.79560715, 1.2033231, -15.73184)
 
 [node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=549070373]
 
