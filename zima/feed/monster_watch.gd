@@ -1,18 +1,15 @@
 extends Node
 
-## 偷吃 / 交付事件 → 屋里那只「怪」的反应。
-## 只负责把事件转给 group "feed_monster" 里的怪物节点（bitkiln 的 MonsterBrain）。
-## 用 active 开关控制：平时冻着站着不动，偷吃就醒过来追人，交付完再冻回去。
+## 偷吃 / 交付事件 → 房东（渔夫）的反应。
+## 房东现在就是那只渔夫，喂食提示、台词、动作都挂在它身上；
+## 这个自动加载只做一件事：把「玩家偷吃」转成房东生气。
 
-const MONSTER_GROUP := &"feed_monster"
-const PLAYER_GROUP := &"player"
+const LANDLORD_GROUP := &"feed_landlord"
 
-## 偷吃时怪物喊的话
-@export var angry_line := "快点送来……别让我亲自去找你。"
-## 交给房东后补的台词（留空则不说）
-@export var calm_line := ""
-## 两次触发之间的最短间隔（秒）
+## 两次触发之间的最短间隔（秒），防止连吃刷屏
 @export var cooldown := 4.0
+## 找不到房东时兜底播的一句话
+@export var fallback_line := "屋里传来一声闷响……"
 
 var _cooldown_left := 0.0
 
@@ -23,31 +20,19 @@ func _process(delta: float) -> void:
 
 
 ## 玩家自己把食物吃掉时调用
-func on_player_ate(item_name: String = "食物") -> void:
+func on_player_ate(_item_name: String = "食物") -> void:
 	if _cooldown_left > 0.0:
 		return
 	_cooldown_left = cooldown
 
-	MessageBanner.show_message("「%s」" % angry_line, Color(1.0, 0.28, 0.22), 2.5)
-
-	var monster := get_tree().get_first_node_in_group(MONSTER_GROUP)
-	if monster == null:
+	var landlord := get_tree().get_first_node_in_group(LANDLORD_GROUP)
+	if landlord == null:
+		MessageBanner.show_message(fallback_line, Color(1.0, 0.28, 0.22), 2.5)
 		return
-	monster.set("active", true)
-	if monster.has_method("hunt"):
-		var player := get_tree().get_first_node_in_group(PLAYER_GROUP)
-		if player != null:
-			monster.call("hunt", player, true)
+	if landlord.has_method("react_angry"):
+		landlord.call("react_angry")
 
 
-## 把食物交给房东时调用：安抚回去，继续装死
+## 把食物交给房东时调用：房东自己会播进食动作，这里只清掉冷却
 func on_food_delivered() -> void:
 	_cooldown_left = 0.0
-	var monster := get_tree().get_first_node_in_group(MONSTER_GROUP)
-	if monster == null:
-		return
-	monster.set("active", false)
-	if monster.has_method("play_animation"):
-		monster.call("play_animation", &"Idle", true)
-	if not calm_line.is_empty():
-		MessageBanner.show_message("「%s」" % calm_line, Color(0.85, 0.85, 0.85), 2.0)

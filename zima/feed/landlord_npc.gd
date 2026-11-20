@@ -22,6 +22,18 @@ extends StaticBody3D
 ## 收到食物时说的台词（留空则不喊）
 @export var thanks_line := "这才像话……别让我等下一次！"
 
+@export_group("外观与动画")
+## 房东本体模型（渔夫 drowned_oilskin.glb 的实例）
+@export var model: Node3D
+## 模型的动画播放器
+@export var animation_player: AnimationPlayer
+## 平时循环播放的待机动画
+@export var idle_animation: StringName = &"Idle"
+## 吃到食物时播一次的动作（包里没有进食动画，暂用 Attack 当啃咬）
+@export var eat_animation: StringName = &"Attack"
+## 玩家偷吃时播一次的生气动作
+@export var angry_animation: StringName = &"Retch"
+
 var _player_near := false
 @onready var _prompt_id := "landlord_%d" % get_instance_id()
 @onready var _zone: Area3D = $PickupZone
@@ -31,6 +43,7 @@ func _ready() -> void:
 	add_to_group("feed_landlord")
 	_zone.body_entered.connect(_on_zone_entered)
 	_zone.body_exited.connect(_on_zone_exited)
+	_play_loop(idle_animation)
 
 
 func _on_zone_entered(body: Node3D) -> void:
@@ -82,6 +95,7 @@ func _receive_food(food: Node3D) -> void:
 	NearPrompt.hide_prompt(_prompt_id)
 	MessageBanner.show_message("你把食物交给了%s。" % display_name, Color(0.55, 0.9, 1.0))
 	MonsterWatch.on_food_delivered()
+	_play_once(eat_animation)
 	if not thanks_line.is_empty():
 		shout(thanks_line)
 	food.queue_free()
@@ -95,6 +109,32 @@ func shout(text: String = "") -> void:
 
 func shout_random_line() -> String:
 	return shout_lines.pick_random() if not shout_lines.is_empty() else "……"
+
+
+## 玩家偷吃被听见：生一次气 + 骂一句
+func react_angry() -> void:
+	_play_once(angry_animation)
+	shout()
+
+
+## 循环播放一个动画（待机用）
+func _play_loop(anim: StringName) -> bool:
+	if animation_player == null or not animation_player.has_animation(anim):
+		return false
+	var a := animation_player.get_animation(anim)
+	if a != null:
+		a.loop_mode = Animation.LOOP_LINEAR
+	animation_player.play(anim)
+	return true
+
+
+## 播一次，结束后回到待机
+func _play_once(anim: StringName) -> void:
+	if animation_player == null or not animation_player.has_animation(anim):
+		return
+	animation_player.play(anim)
+	await animation_player.animation_finished
+	_play_loop(idle_animation)
 
 
 ## 供相机 [E] 键测试：对准房东按 E 会随机喊一句
