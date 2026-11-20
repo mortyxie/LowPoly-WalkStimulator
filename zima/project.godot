@@ -45,6 +45,19 @@ window/stretch/aspect="expand"
 
 enabled=PackedStringArray("res://addons/button_prompts_for_godot/plugin.cfg", "res://addons/input_helper/plugin.cfg", "res://addons/quick_audio/plugin.cfg", "res://addons/godot_retro/plugin.cfg", "res://addons/footstepper/plugin.cfg")
 
+[importer_defaults]
+
+scene={
+"animation/fps": 30,
+"gltf/embedded_image_handling": 3,
+"meshes/generate_lods": false
+}
+texture={
+"compress/mode": 0,
+"detect_3d/compress_to": 0,
+"mipmaps/generate": false
+}
+
 [input]
 
 up={
@@ -90,16 +103,3 @@ pickup={
 [rendering]
 
 rendering_device/driver.windows="d3d12"
-
-[importer_defaults]
-
-scene={
-"animation/fps": 30,
-"gltf/embedded_image_handling": 3,
-"meshes/generate_lods": false
-}
-texture={
-"compress/mode": 0,
-"detect_3d/compress_to": 0,
-"mipmaps/generate": false
-}

@@ -1,0 +1,29 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://feed/weapon_item.gd" id="1_weapon"]
+[ext_resource type="PackedScene" path="res://feed/weapons/knife/PSX Rusted Knife.fbx" id="2_model"]
+
+[sub_resource type="BoxShape3D" id="ShapeKnife"]
+size = Vector3(0.05, 0.06, 0.34)
+
+[sub_resource type="SphereShape3D" id="ZoneShape"]
+radius = 1.6
+
+[node name="WeaponKnife" type="RigidBody3D"]
+collision_layer = 3
+mass = 0.4
+freeze = true
+script = ExtResource("1_weapon")
+item_name = "刀"
+
+[node name="Model" parent="." instance=ExtResource("2_model")]
+transform = Transform3D(0.07, 0, 0, 0, 0, 0.07, 0, -0.07, 0, 0, 0, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.008, -0.003)
+shape = SubResource("ShapeKnife")
+
+[node name="PickupZone" type="Area3D" parent="."]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="PickupZone"]
+shape = SubResource("ZoneShape")
