@@ -45,6 +45,10 @@ window/stretch/aspect="expand"
 
 enabled=PackedStringArray("res://addons/button_prompts_for_godot/plugin.cfg", "res://addons/input_helper/plugin.cfg", "res://addons/quick_audio/plugin.cfg", "res://addons/godot_retro/plugin.cfg", "res://addons/footstepper/plugin.cfg")
 
+[gui]
+
+theme/custom="res://assets/fonts/pixel_ui.tres"
+
 [importer_defaults]
 
 scene={
