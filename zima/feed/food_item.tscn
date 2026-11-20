@@ -3,14 +3,7 @@
 [ext_resource type="Script" path="res://feed/food_item.gd" id="1_food"]
 
 [sub_resource type="BoxShape3D" id="FoodShape"]
-size = Vector3(0.45, 0.45, 0.45)
-
-[sub_resource type="StandardMaterial3D" id="FoodMat"]
-albedo_color = Color(0.92, 0.7, 0.2, 1)
-
-[sub_resource type="BoxMesh" id="FoodMesh"]
-material = SubResource("FoodMat")
-size = Vector3(0.45, 0.45, 0.45)
+size = Vector3(0.3, 0.1, 0.3)
 
 [sub_resource type="SphereShape3D" id="ZoneShape"]
 radius = 1.6
@@ -24,8 +17,7 @@ script = ExtResource("1_food")
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 shape = SubResource("FoodShape")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
-mesh = SubResource("FoodMesh")
+[node name="Model" type="Node3D" parent="."]
 
 [node name="PickupZone" type="Area3D" parent="."]
 

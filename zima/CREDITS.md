@@ -9,6 +9,15 @@
 - 使用文件：`monsters/drowned/`（drowned.tscn、drowned_oilskin.glb、drowned_deckhand.glb 及贴图）、
   `scripts/monster_brain.gd`、`shaders/psx_lit*.gdshader`、`shaders/apply_psx.gd`
 
+## 食物模型
+
+- **PSX Kitchen Props Pack**（披萨一角、吐司）by Nicowlas — 付费素材包
+  授权：可用于个人与商业项目、可修改；不可转售、不可再分发原始文件（含修改后的版本）。
+  以 `glb/` 里两个模型内嵌贴图的版本接入：`feed/food_models/food_pizza.glb`、`food_toast.glb`
+- **PSX Survival Items - Free Sample**（豆子罐头）by Fanix Studio —
+  https://fanixstudio.itch.io （免费用于个人与商业项目，可修改；不可转售或再分发素材本身）
+  使用文件：`feed/food_models/food_can_beans.glb`
+
 ## 插件
 
 - **PS1 RPG Menu Kit Free** — PS1 风渐变窗口、菜单列表、对话框（`addons/ps1_rpg_menu`），

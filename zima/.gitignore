@@ -1,3 +1,7 @@
 # Godot 4+ specific ignores
 .godot/
 /android/
+
+# 食物模型：素材包原件（授权禁止随仓库再分发），只在本地保留，见 feed/food_models/README.md
+/feed/food_models/*.glb
+/feed/food_models/*.import
