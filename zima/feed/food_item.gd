@@ -26,7 +26,9 @@ extends RigidBody3D
 
 ## 相机下的手持偏移（右/下/前），按 0.3 m 左右的食物调校
 const HAND_OFFSET := Vector3(0.38, -0.38, -0.8)
-const DEFAULT_MODEL := preload("res://feed/food_models/food_pizza.glb")
+## 默认模型用运行时 load 而不是 preload：这些 glb 被 gitignore 了，
+## 队友 clone 下来没有文件时不能把整个脚本拖成解析错误。
+const DEFAULT_MODEL_PATH := "res://feed/food_models/food_pizza.glb"
 ## 碰撞盒最小边，免得薄片模型变成一张没厚度的纸
 const MIN_COLLISION := 0.06
 
@@ -48,8 +50,13 @@ func _ready() -> void:
 
 ## 实例化模型、居中、按包围盒配碰撞盒，再套上和其他场景物一样的 PSX 材质
 func _build_model() -> void:
-	var packed: PackedScene = model_scene if model_scene != null else DEFAULT_MODEL
+	var packed: PackedScene = model_scene
+	if packed == null and ResourceLoader.exists(DEFAULT_MODEL_PATH):
+		# 先 exists 再 load：文件不存在时 load 会自己打一条 Resource file not found 的 ERROR
+		packed = load(DEFAULT_MODEL_PATH) as PackedScene
 	if packed == null:
+		push_warning("FeedFoodItem: 找不到食物模型 %s（这批 glb 被 gitignore，按 feed/food_models/README.md 补齐）" % DEFAULT_MODEL_PATH)
+		_build_fallback()
 		return
 	var model := packed.instantiate() as Node3D
 	if model == null:
@@ -62,6 +69,22 @@ func _build_model() -> void:
 	# 世界树是在 main.gd 里一次性转 PSX 材质的，运行时机加的模型要自己转一遍
 	PSX.convert(model)
 	PSX.apply_ps1(model)
+
+
+## 一个模型都没有时（clone 下来没补 glb）用的黄方块占位，保证食物还能看见、能捡
+func _build_fallback() -> void:
+	var mi := MeshInstance3D.new()
+	mi.name = "FallbackMesh"
+	var box := BoxMesh.new()
+	box.size = Vector3(0.3, 0.1, 0.3)
+	var mat := StandardMaterial3D.new()
+	mat.albedo_color = Color(0.92, 0.7, 0.2)
+	box.material = mat
+	mi.mesh = box
+	_model.add_child(mi)
+	_center_model(mi)
+	PSX.convert(mi)
+	PSX.apply_ps1(mi)
 
 
 ## 把模型的重心挪到节点原点，并把碰撞盒改成模型的实际大小

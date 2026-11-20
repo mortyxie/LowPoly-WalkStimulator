@@ -1,20 +1,19 @@
 extends CanvasLayer
-## PSX 风格对话气球：用 ps1_rpg_menu 的渐变窗口、名字标签和逐字打字，选项用它的菜单列表。
-## 由 Dialogue Manager 的 runtime/balloon_path 设置调用。
+## 极简对话气球：纯白字、一根白线框、完全透明底。不再用 ps1_rpg_menu 的渐变窗口。
+## Dialogue Manager 只要一个 start() 方法，其余都是自己的事。
 
-const Kit := preload("res://addons/ps1_rpg_menu/menu/kit.gd")
-const DialogueBoxScript := preload("res://addons/ps1_rpg_menu/menu/dialogue_box.gd")
-const MenuListScript := preload("res://addons/ps1_rpg_menu/menu/menu_list.gd")
 const PIXEL_FONT: FontFile = preload("res://assets/fonts/fusion-pixel-12px-zh_hans.ttf")
 
 ## 美术按 1x 画（240 像素高的画面），整个 UI 放大这个整数倍，像素才不糊。
 const ART_SCALE := 3.0
-## 字号必须是 12 的整数倍（缝合像素是 12px 点阵）。
+## 字号必须是 12 的整数倍（像素字是 12px 点阵）。
 const FONT_SIZE := 12
 ## 文本框离屏幕左、右、下各多少美术像素。
 const BOX_MARGIN := 8
-## 文本区显示几行，超出就换行。
-const BOX_LINES := 2
+## 框内四边的留白。
+const PADDING := 6
+## 边框粗细（美术像素）。
+const BORDER := 1
 ## 每秒打出几个字。
 const TYPE_SPEED := 32.0
 ## 正文和选项之间的缝。
@@ -28,32 +27,36 @@ var will_block_other_input := true
 var next_action: StringName = &"ui_accept"
 var skip_action: StringName = &"ui_cancel"
 
-var _root: Control
-var _holder: Control
-var _box: Node
-var _content: Control
-var _menu_holder: Control
-var _menu: Node
-var _spacer: Control
-var _theme: Theme
+var _root: MarginContainer
+var _holder: VBoxContainer
+var _panel: PanelContainer
+var _content: VBoxContainer
+var _name_label: Label
+var _text_label: Label
+var _arrow: Label
+var _choices_box: VBoxContainer
+
 var _line: DialogueLine
 var _choices: Array = []
+var _buttons: Array[Button] = []
+var _focus := 0
+
+var _typing := false
+var _typed := 0.0
+var _blink := 0.0
 
 
 func _ready() -> void:
 	layer = 20
+	_build_ui()
+	visible = false
 
-	_theme = Kit.kit_theme("night").duplicate(true)
-	_theme.default_font = PIXEL_FONT
-	_theme.default_font_size = FONT_SIZE
-	_theme.set_font(&"font", &"Label", PIXEL_FONT)
-	_theme.set_font_size(&"font_size", &"Label", FONT_SIZE)
 
+func _build_ui() -> void:
 	var root := MarginContainer.new()
 	root.name = "Art"
 	root.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	root.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
-	root.theme = _theme
 	root.add_theme_constant_override(&"margin_left", BOX_MARGIN)
 	root.add_theme_constant_override(&"margin_top", BOX_MARGIN)
 	root.add_theme_constant_override(&"margin_right", BOX_MARGIN)
@@ -63,61 +66,73 @@ func _ready() -> void:
 
 	_holder = VBoxContainer.new()
 	_holder.name = "Holder"
-	(_holder as BoxContainer).alignment = BoxContainer.ALIGNMENT_END
-	_root.add_child(_holder)
+	_holder.alignment = BoxContainer.ALIGNMENT_END
+	_holder.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	root.add_child(_holder)
 
-	_box = DialogueBoxScript.new()
-	_box.name = "DialogueBox"
-	_box.set("speed", TYPE_SPEED)
-	_box.set("lines", BOX_LINES)
-	_box.set("takes_input", false)
-	_holder.add_child(_box)
-	_box.connect("finished", _on_typing_finished)
-	_box.connect("advanced", _on_advance)
+	# 透明底 + 一根白线：除了边框什么都不画
+	var style := StyleBoxFlat.new()
+	style.bg_color = Color(0, 0, 0, 0)
+	style.border_color = Color(1, 1, 1, 1)
+	style.set_border_width_all(BORDER)
+	style.set_content_margin_all(PADDING)
+	style.anti_aliasing = false
 
-	# 窗口（PanelContainer）会把子节点叠在同一块地方，所以正文和选项先塞进一个竖排容器
+	_panel = PanelContainer.new()
+	_panel.name = "Frame"
+	_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_panel.add_theme_stylebox_override(&"panel", style)
+	_holder.add_child(_panel)
+
 	_content = VBoxContainer.new()
 	_content.name = "Content"
-	_box.add_child(_content)
-	var text_label: Control = _box.get("text_label")
-	text_label.reparent(_content)
+	_content.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_content.add_theme_constant_override(&"separation", 2)
+	_panel.add_child(_content)
 
-	_spacer = Control.new()
-	_spacer.name = "Gap"
-	_spacer.custom_minimum_size = Vector2(0, CHOICE_GAP)
-	_spacer.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_content.add_child(_spacer)
+	_name_label = Label.new()
+	_name_label.name = "Speaker"
+	_name_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_setup_label(_name_label)
+	_content.add_child(_name_label)
 
-	_menu = MenuListScript.new()
-	_menu.name = "Choices"
-	_menu.set("columns", 1)
-	_menu.set("sounds", true)
-	_menu.set("active", false)
-	_menu.visible = false
+	_text_label = Label.new()
+	_text_label.name = "Text"
+	_text_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_text_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_setup_label(_text_label)
+	_content.add_child(_text_label)
 
-	# 左边留一条槽，让那块浮动的光标箭头不压到窗口边框和第一个字
-	var menu_holder := MarginContainer.new()
-	menu_holder.name = "ChoiceGutter"
-	menu_holder.add_theme_constant_override(&"margin_left", 10)
-	menu_holder.add_theme_constant_override(&"margin_right", 6)
-	_content.add_child(menu_holder)
-	_menu_holder = menu_holder
-	menu_holder.add_child(_menu)
-	_menu.connect("chosen", _on_chosen)
-	_menu.connect("cancelled", _on_choice_cancelled)
+	_arrow = Label.new()
+	_arrow.name = "NextMark"
+	_arrow.text = "▼"
+	_arrow.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	_arrow.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_setup_label(_arrow)
+	_content.add_child(_arrow)
 
-	_box.visible = false
-	hide()
+	_choices_box = VBoxContainer.new()
+	_choices_box.name = "Choices"
+	_choices_box.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_choices_box.add_theme_constant_override(&"separation", CHOICE_GAP)
+	_content.add_child(_choices_box)
+
 	get_viewport().size_changed.connect(_layout)
 	_layout()
+
+
+func _setup_label(label: Label) -> void:
+	label.add_theme_font_override(&"font", PIXEL_FONT)
+	label.add_theme_font_size_override(&"font_size", FONT_SIZE)
+	label.add_theme_color_override(&"font_color", Color.WHITE)
+	label.add_theme_color_override(&"font_shadow_color", Color(0, 0, 0, 0))
 
 
 func _layout() -> void:
 	if not is_instance_valid(_root):
 		return
-	var view: Vector2 = get_viewport().get_visible_rect().size / ART_SCALE
 	_root.scale = Vector2(ART_SCALE, ART_SCALE)
-	_root.size = view
+	_root.size = get_viewport().get_visible_rect().size / ART_SCALE
 
 
 ## 开始一段对话，Dialogue Manager 会调这个。
@@ -125,79 +140,149 @@ func start(resource: DialogueResource = null, cue := "", extra_game_states: Arra
 	temporary_game_states = [self] + extra_game_states
 	if resource != null:
 		dialogue_resource = resource
+	if dialogue_resource == null:
+		push_warning("PsxBalloon: 没有 dialogue_resource")
+		queue_free()
+		return
 	_layout()
 	show()
 	dialogue_line = await dialogue_resource.get_next_dialogue_line(cue, temporary_game_states)
 	_show_line(dialogue_line)
 
 
-## 显示一行：名字进名字标签，正文逐字打出。
 func _show_line(line: DialogueLine) -> void:
 	_line = line
 	if line == null:
 		_close()
 		return
-	_choices.clear()
-	_menu.visible = false
-	_menu.call("set", "active", false)
-	_box.call("set", "takes_input", true)
-	_box.visible = true
+	_clear_choices()
 	var speaker := "" if line.character.is_empty() else tr(line.character, "dialogue")
-	_box.call("say", tr(line.text, "dialogue"), speaker)
-	_set_next_mark(_box.call("get_theme_icon", &"next", &"Menu"))
+	_name_label.text = speaker
+	_name_label.visible = not speaker.is_empty()
+	_text_label.text = tr(line.text, "dialogue")
+	_text_label.visible_characters = 0
+	_typed = 0.0
+	_typing = true
+	_arrow.visible = false
+	_panel.visible = true
 
 
-func _on_typing_finished() -> void:
+func _process(delta: float) -> void:
+	if not visible:
+		return
+	if _typing:
+		_typed += TYPE_SPEED * delta
+		_text_label.visible_characters = int(_typed)
+		if _typed >= float(_text_label.get_total_character_count()):
+			_finish_typing()
+		return
+	if _arrow.visible:
+		_blink += delta
+		if _blink >= 0.45:
+			_blink = 0.0
+			_arrow.modulate.a = 0.0 if _arrow.modulate.a > 0.5 else 1.0
+
+
+func _finish_typing() -> void:
+	_typing = false
+	_text_label.visible_characters = -1
 	if _line == null:
 		return
+	_collect_choices()
+	if _choices.is_empty():
+		_arrow.visible = true
+		_blink = 0.0
+		_arrow.modulate.a = 1.0
+		is_waiting_for_input = true
+	else:
+		_arrow.visible = false
+		_show_choices()
+
+
+func _collect_choices() -> void:
+	_choices.clear()
 	for response in _line.responses:
 		if response.is_allowed:
 			_choices.append(response)
-	if _choices.is_empty():
-		is_waiting_for_input = true
+
+
+func _show_choices() -> void:
+	_clear_choices()
+	_focus = 0
+	for i in _choices.size():
+		var button := Button.new()
+		button.flat = true
+		button.focus_mode = Control.FOCUS_NONE
+		button.alignment = HORIZONTAL_ALIGNMENT_LEFT
+		button.mouse_filter = Control.MOUSE_FILTER_STOP
+		button.add_theme_font_override(&"font", PIXEL_FONT)
+		button.add_theme_font_size_override(&"font_size", FONT_SIZE)
+		for key in [&"font_color", &"font_hover_color", &"font_pressed_color", &"font_focus_color"]:
+			button.add_theme_color_override(key, Color.WHITE)
+		var empty := StyleBoxEmpty.new()
+		for key in [&"normal", &"hover", &"pressed", &"focus", &"disabled"]:
+			button.add_theme_stylebox_override(key, empty)
+		button.pressed.connect(_on_choice_pressed.bind(i))
+		button.mouse_entered.connect(_set_focus.bind(i))
+		_choices_box.add_child(button)
+		_buttons.append(button)
+	_refresh_choice_text()
+	is_waiting_for_input = true
+	# 选项多行时让框跟着长高
+	_panel.queue_sort()
+
+
+func _refresh_choice_text() -> void:
+	for i in _buttons.size():
+		var mark := "> " if i == _focus else "  "
+		_buttons[i].text = mark + tr(_choices[i].text, "dialogue")
+
+
+func _clear_choices() -> void:
+	for button in _buttons:
+		if is_instance_valid(button):
+			button.queue_free()
+	_buttons.clear()
+
+
+func _set_focus(index: int) -> void:
+	if index < 0 or index >= _buttons.size():
 		return
-	var items: Array = []
-	for response in _choices:
-		items.append({"text": tr(response.text, "dialogue")})
-	_menu.call("set_items", items)
-	_menu.visible = true
-	_menu.call("set", "active", true)
-	_set_next_mark(null)
-	_box.call("update_minimum_size")
-	_holder.call("queue_sort")
-	_box.call("set", "takes_input", false)
+	_focus = index
+	_refresh_choice_text()
 
 
-## 右下角那个跳动的“下一句”箭头；给 null 就收起来（有选项时用不上）。
-func _set_next_mark(texture: Texture2D) -> void:
-	var mark := _box.get("next_mark") as TextureRect
-	if mark != null:
-		mark.texture = texture
-		mark.visible = texture != null
+func _move_focus(step: int) -> void:
+	if _buttons.is_empty():
+		return
+	_set_focus(wrapi(_focus + step, 0, _buttons.size()))
 
 
-func _on_advance() -> void:
-	if _line == null:
+func _on_choice_pressed(index: int) -> void:
+	if index < 0 or index >= _choices.size():
+		return
+	is_waiting_for_input = false
+	_clear_choices()
+	_go(_choices[index].next_id)
+
+
+func _accept() -> void:
+	if _typing:
+		_finish_typing()
+		return
+	if not is_waiting_for_input:
+		return
+	if not _buttons.is_empty():
+		_on_choice_pressed(_focus)
 		return
 	is_waiting_for_input = false
 	_go(_line.next_id)
 
 
-func _on_chosen(index: int) -> void:
-	if index < 0 or index >= _choices.size():
-		return
-	is_waiting_for_input = false
-	_menu.visible = false
-	_menu.call("set", "active", false)
-	_box.call("set", "takes_input", false)
-	_go(_choices[index].next_id)
-
-
-func _on_choice_cancelled() -> void:
-	pass
-
-
 func _go(next_id: String) -> void:
+	if next_id.is_empty():
+		_close()
+		return
 	dialogue_line = await dialogue_resource.get_next_dialogue_line(next_id, temporary_game_states)
 	_show_line(dialogue_line)
 
@@ -209,5 +294,13 @@ func _close() -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	if will_block_other_input and visible:
+	if not visible:
+		return
+	if event.is_action_pressed(next_action):
+		_accept()
+	elif event.is_action_pressed(&"ui_down") or event.is_action_pressed(&"ui_right"):
+		_move_focus(1)
+	elif event.is_action_pressed(&"ui_up") or event.is_action_pressed(&"ui_left"):
+		_move_focus(-1)
+	if will_block_other_input:
 		get_viewport().set_input_as_handled()
