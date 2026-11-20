@@ -15,7 +15,7 @@
 [ext_resource type="PackedScene" path="res://feed/landlord_npc.tscn" id="11_feed"]
 [ext_resource type="Script" uid="uid://bfwyjcvtiew6d" path="res://addons/footstepper/footstepper.gd" id="12_foot"]
 [ext_resource type="Resource" uid="uid://236be04aq3fs" path="res://addons/footstepper/example-profiles/default_profile.tres" id="13_foot"]
-[ext_resource type="PackedScene" path="res://monsters/crab/crab.tscn" id="14_crab"]
+[ext_resource type="PackedScene" path="res://monsters/drowned/drowned.tscn" id="14_drowned"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_ixvud"]
 margin = 0.0
@@ -334,7 +334,7 @@ script = ExtResource("3_yh3jj")
 environment = SubResource("Environment_q2xc8")
 compositor = SubResource("Compositor_ogfck")
 
-[node name="GiantCrab" parent="PSXScreen/SubViewport/World" instance=ExtResource("14_crab") groups=["feed_monster"] unique_id=1720231456]
+[node name="DrownedFisherman" parent="PSXScreen/SubViewport/World" instance=ExtResource("14_drowned") groups=["feed_monster"] unique_id=1720231456]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -12)
 active = false
 wander = false

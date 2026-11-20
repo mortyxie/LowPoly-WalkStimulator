@@ -6,7 +6,7 @@
   by bitkiln — https://bitkiln.itch.io/psx-sea-horror-monsters-free-sampler
   授权：免费用于个人与商业项目，可修改；不可转售或作为素材包再分发。
   署名非强制，此处标注：Art by bitkiln。
-- 使用文件：`monsters/crab/`（crab.tscn、crab_rust.glb、crab_bone.glb 及贴图）、
+- 使用文件：`monsters/drowned/`（drowned.tscn、drowned_oilskin.glb、drowned_deckhand.glb 及贴图）、
   `scripts/monster_brain.gd`、`shaders/psx_lit*.gdshader`、`shaders/apply_psx.gd`
 
 ## 插件
