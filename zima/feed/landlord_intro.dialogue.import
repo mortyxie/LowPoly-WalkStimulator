@@ -1,0 +1,16 @@
+[remap]
+
+importer="dialogue_manager"
+importer_version=18
+type="Resource"
+uid="uid://rfhh7d5wlcfg"
+path="res://.godot/imported/landlord_intro.dialogue-fc985c3b899f27d7c985e556f0c4a90c.tres"
+
+[deps]
+
+source_file="res://feed/landlord_intro.dialogue"
+dest_files=["res://.godot/imported/landlord_intro.dialogue-fc985c3b899f27d7c985e556f0c4a90c.tres"]
+
+[params]
+
+defaults=true

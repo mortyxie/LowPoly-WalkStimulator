@@ -65,6 +65,13 @@ const PHASE_FEED := 1
 ## 生气/被偷吃时播一次
 @export var angry_animation: StringName = &"Retch"
 
+@export_group("开场对话")
+## 出生时自动播放的开场对话（.dialogue 资源），留空则不自动播
+@export var intro_dialogue: DialogueResource
+## 出生后等几秒再开口
+@export var intro_delay := 1.5
+## 只在出生后播一次
+@export var intro_once := true
 var weapons_given := 0
 var food_given := 0
 var pressure := 0
@@ -72,6 +79,8 @@ var pressure := 0
 var _nag_left := 0.0
 var _ask_cooldown := 0.0
 var _player_near := false
+var _intro_done := false
+var _intro_playing := false
 
 @onready var _prompt_id := "landlord_%d" % get_instance_id()
 @onready var _zone: Area3D = $PickupZone
@@ -82,6 +91,8 @@ func _ready() -> void:
 	_zone.body_entered.connect(_on_zone_entered)
 	_zone.body_exited.connect(_on_zone_exited)
 	_play_loop(idle_animation)
+	if intro_dialogue != null:
+		_schedule_intro()
 
 
 func _process(delta: float) -> void:
@@ -89,7 +100,7 @@ func _process(delta: float) -> void:
 		_ask_cooldown -= delta
 	_tick_nag(delta)
 
-	if _player_near and _get_carried() != null:
+	if _player_near and not _intro_playing and _get_carried() != null:
 		NearPrompt.show_prompt(_prompt_id, "[鼠标左键] 交给%s" % display_name)
 	else:
 		NearPrompt.hide_prompt(_prompt_id)
@@ -110,6 +121,8 @@ func _on_zone_entered(body: Node3D) -> void:
 	if not (body is CharacterBody3D):
 		return
 	_player_near = true
+	if _intro_playing:
+		return
 	if phase == PHASE_ASK and _ask_cooldown <= 0.0:
 		_ask_cooldown = 10.0
 		shout(_pick(ask_weapon_lines))
@@ -129,6 +142,8 @@ func is_player_near() -> bool:
 
 ## 由相机仲裁调用：交付手持物。成功返回 true。
 func try_deliver() -> bool:
+	if _intro_playing:
+		return false
 	if not _player_near:
 		return false
 	var item := _get_carried()
@@ -285,4 +300,50 @@ func _play_once(anim: StringName) -> void:
 	animation_player.play(anim)
 	await animation_player.animation_finished
 	_play_loop(idle_animation)
+
+
+# ---- 开场对话 ----
+
+## 出生后延迟自动触发开场
+func _schedule_intro() -> void:
+	if intro_once and _intro_done:
+		return
+	await get_tree().create_timer(intro_delay).timeout
+	if not is_inside_tree():
+		return
+	start_intro()
+
+
+## 主动开场：对话期间隐藏交付提示、锁住玩家移动
+func start_intro() -> void:
+	if intro_once and _intro_done:
+		return
+	if intro_dialogue == null:
+		return
+	_intro_done = true
+	_intro_playing = true
+	NearPrompt.hide_prompt(_prompt_id)
+	_face_player()
+	_play_loop(idle_animation)
+
+	var balloon: Node = DialogueManager.show_dialogue_balloon(intro_dialogue)
+	if balloon == null:
+		_intro_playing = false
+		return
+
+	# 对话框要靠鼠标点选项，先把指针放出来，结束后还原
+	var prev_mouse = Input.get_mouse_mode()
+	Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
+
+	var player := get_tree().get_first_node_in_group(&"player")
+	if player != null:
+		player.set_physics_process(false)
+	balloon.tree_exited.connect(_on_intro_finished.bind(player, prev_mouse))
+
+
+func _on_intro_finished(player: Node, prev_mouse) -> void:
+	_intro_playing = false
+	Input.set_mouse_mode(prev_mouse)
+	if player != null and is_instance_valid(player):
+		player.set_physics_process(true)
 

@@ -1,7 +1,8 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene load_steps=6 format=3]
 
 [ext_resource type="Script" path="res://feed/landlord_npc.gd" id="1_npc"]
 [ext_resource type="PackedScene" path="res://monsters/drowned/drowned_oilskin.glb" id="2_model"]
+[ext_resource type="Resource" uid="uid://rfhh7d5wlcfg" path="res://feed/landlord_intro.dialogue" id="3_dlg"]
 
 [sub_resource type="CapsuleShape3D" id="NpcShape"]
 radius = 0.36
@@ -15,6 +16,7 @@ script = ExtResource("1_npc")
 display_name = "房东"
 model = NodePath("Model")
 animation_player = NodePath("Model/AnimationPlayer")
+intro_dialogue = ExtResource("3_dlg")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.89, 0)
