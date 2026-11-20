@@ -24,17 +24,17 @@ const PHASE_FEED := 1
 
 @export_group("台词 · 收刀阶段")
 @export var ask_weapon_lines: Array[String] = [
-	"乖，把刀放我这儿，厨房里不该有这东西。",
-	"斧头也交出来吧，省得你半夜把自己伤着。",
-	"我替你收着，等你乖了，再还给你。",
+	"这是为了你和其他人的安全。",
+	"哦，好孩子。",
+	"没错就是这样。",
 ]
 @export var weapon_thanks_lines: Array[String] = [
 	"对，就这样。",
 	"乖孩子。",
 	"这才听话。",
 ]
-@export var reject_food_line := "先把手上的东西都交上来，再谈吃的。"
-@export var phase_up_line := "好了，刀都在我这儿了……现在，我饿了。"
+@export var reject_food_line := "先把不安全的东西都交上来，再品味美食。"
+@export var phase_up_line := "好了，刀都在我这儿了…… 现在，我饿了。"
 @export var steal_in_ask_line := "……你刚才，是不是偷吃了？先把刀交出来。"
 
 @export_group("台词 · 喂食阶段")
@@ -48,9 +48,9 @@ const PHASE_FEED := 1
 	"别让我站起来。",
 ]
 @export var food_menacing_lines: Array[String] = [
-	"我忍你很久了。",
-	"再磨一次，你就不用喂了。",
-	"你猜，我把你的刀收在哪儿？",
+	"我要的东西呢！！！",
+	"快点！",
+	"废物！这都做不好",
 ]
 
 @export_group("外观与动画")
