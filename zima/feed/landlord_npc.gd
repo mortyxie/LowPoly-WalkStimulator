@@ -10,6 +10,9 @@ extends StaticBody3D
 const PHASE_ASK := 0
 const PHASE_FEED := 1
 
+## 房东进入喂食阶段时广播（LoopManager 据此启动喂食压力计时）
+signal entered_feed_phase
+
 @export var display_name := "房东"
 
 @export_group("流程")
@@ -21,6 +24,9 @@ const PHASE_FEED := 1
 @export var nag_interval := 45.0
 ## 压力值到这个数就彻底露本性（偷吃 +1、每次催促 +1）
 @export var menacing_threshold := 3
+## 是否还收武器（轮回 2/3 由 LoopManager 关掉：剩下的武器归玩家）
+@export var accept_weapons := true
+@export var reject_weapon_line := "留一把……自己收好。它陪着你。"
 
 @export_group("台词 · 收刀阶段")
 @export var ask_weapon_lines: Array[String] = [
@@ -100,10 +106,22 @@ func _process(delta: float) -> void:
 		_ask_cooldown -= delta
 	_tick_nag(delta)
 
-	if _player_near and not _intro_playing and _get_carried() != null:
+	# 只有「该交的东西」在手边才提示交付，别拿着钥匙也喊"交给房东"
+	if _player_near and not _intro_playing and _should_show_deliver_prompt():
 		NearPrompt.show_prompt(_prompt_id, "[鼠标左键] 交给%s" % display_name)
 	else:
 		NearPrompt.hide_prompt(_prompt_id)
+
+
+func _should_show_deliver_prompt() -> bool:
+	var item := _get_carried()
+	if item == null:
+		return false
+	if item.is_in_group("feed_food"):
+		return phase == PHASE_FEED
+	if item.is_in_group("feed_weapon"):
+		return accept_weapons
+	return false
 
 
 func _tick_nag(delta: float) -> void:
@@ -151,6 +169,9 @@ func try_deliver() -> bool:
 		return false
 
 	if item.is_in_group("feed_weapon"):
+		if not accept_weapons:
+			shout(reject_weapon_line)
+			return false
 		_receive_weapon(item)
 		return true
 
@@ -164,6 +185,21 @@ func try_deliver() -> bool:
 	return false
 
 
+## LoopManager 每轮开始时调用：按当轮策划重置房东的阶段与计数
+func reset_for_loop(new_phase: int, new_required_weapons: int, new_accept_weapons: bool) -> void:
+	phase = new_phase
+	required_weapons = new_required_weapons
+	accept_weapons = new_accept_weapons
+	weapons_given = 0
+	food_given = 0
+	pressure = 0
+	_nag_left = 0.0
+	_ask_cooldown = 0.0
+	# 喂食阶段直接开场的话，立刻广播（LoopManager 据此开始喂食压力计时）
+	if phase == PHASE_FEED:
+		entered_feed_phase.emit()
+
+
 func _receive_weapon(item: Node3D) -> void:
 	_take_carried()
 	weapons_given += 1
@@ -171,12 +207,17 @@ func _receive_weapon(item: Node3D) -> void:
 		"你把%s交给了%s。" % [_item_name(item), display_name],
 		Color(0.55, 0.9, 1.0))
 	shout(_pick(weapon_thanks_lines))
+	# 凶器上交 = 永久消失（LoopManager 记账，轮回 2 只刷没交的那把）
+	var lm := get_tree().root.get_node_or_null("/root/LoopManager")
+	if lm != null and lm.has_method(&"on_weapon_handed"):
+		lm.call(&"on_weapon_handed", item)
 	item.queue_free()
 
 	if phase == PHASE_ASK and weapons_given >= required_weapons:
 		phase = PHASE_FEED
 		weapons_given = 0
 		_nag_left = 0.0
+		entered_feed_phase.emit()
 		MessageBanner.show_message(
 			"%s：%s" % [display_name, phase_up_line],
 			Color(1.0, 0.28, 0.22), 3.0)
@@ -189,6 +230,9 @@ func _receive_food(food: Node3D) -> void:
 	MessageBanner.show_message(
 		"你把食物交给了%s。" % display_name,
 		Color(0.55, 0.9, 1.0))
+	var lm := get_tree().root.get_node_or_null("/root/LoopManager")
+	if lm != null and lm.has_method(&"on_food_delivered"):
+		lm.call(&"on_food_delivered")
 	var watch := get_tree().root.get_node_or_null("/root/MonsterWatch")
 	if watch != null and watch.has_method(&"on_food_delivered"):
 		watch.call(&"on_food_delivered")

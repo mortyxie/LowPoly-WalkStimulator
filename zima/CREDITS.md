@@ -18,6 +18,14 @@
   https://fanixstudio.itch.io （免费用于个人与商业项目，可修改；不可转售或再分发素材本身）
   使用文件：`feed/food_models/food_can_beans.glb`
 
+## 钥匙与工具
+
+- **COGITO — Immersive Sim Template for Godot 4** by Phazorknight —
+  https://github.com/Phazorknight/Cogito
+  授权：MIT。假钥匙的金色造型（BoxMesh 钥匙身 + PrismMesh 齿 + CylinderMesh 柄）
+  1:1 复刻自其 `pickup_key.tscn`（几何与材质参数一致），见 `feed/quest_item.gd`。
+  插件完整拷贝在 `addons/cogito/`（未启用，按需取用素材）。
+
 ## 插件
 
 - **PS1 RPG Menu Kit Free** — PS1 风渐变窗口、菜单列表、对话框（`addons/ps1_rpg_menu`），

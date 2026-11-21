@@ -14,8 +14,20 @@ func _ready() -> void:
 	_clear_prompt()
 
 func _physics_process(_delta: float) -> void:
-	if _player_inside and Input.is_action_just_pressed(interact_action):
+	if _player_inside and not _input_locked() and Input.is_action_just_pressed(interact_action):
 		interacted.emit()
+
+
+## 时机判定小游戏 / 黑屏过渡期间锁住 E 交互
+func _input_locked() -> bool:
+	var lm := get_tree().root.get_node_or_null("/root/LoopManager")
+	return lm != null and lm.get("input_locked") == true
+
+
+## LoopManager 换轮后刷新脚下提示文字
+func refresh_prompt() -> void:
+	if _player_inside:
+		_set_prompt(_build_prompt())
 
 func _on_body_entered(body: Node3D) -> void:
 	if body is not CharacterBody3D:
@@ -30,7 +42,7 @@ func _on_body_exited(body: Node3D) -> void:
 	_clear_prompt()
 
 func _build_prompt() -> String:
-	var text := "按 E " + action_text
+	var text := "按 F " + action_text
 	if display_name != "":
 		text += " · " + display_name
 	return text

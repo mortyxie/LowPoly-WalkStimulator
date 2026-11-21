@@ -21,6 +21,9 @@ extends RigidBody3D
 @export_group("模型")
 ## 换个食物就在这里拖一个 glb 场景进来，留空用默认的披萨一角
 @export var model_scene: PackedScene
+## 运行时按路径指定模型（LoopManager 随机刷食物种类用），优先级高于 model_scene。
+## 文件缺失时照样回退黄方块，不会拖垮工程。
+@export var model_override_path := ""
 ## 原模型只有 0.15~0.33 m，放大一点才看得清拿在手上的样子
 @export var model_scale := 1.4
 
@@ -51,6 +54,9 @@ func _ready() -> void:
 ## 实例化模型、居中、按包围盒配碰撞盒，再套上和其他场景物一样的 PSX 材质
 func _build_model() -> void:
 	var packed: PackedScene = model_scene
+	# 运行时指定的路径优先（食物点位池随机换种类用）
+	if not model_override_path.is_empty() and ResourceLoader.exists(model_override_path):
+		packed = load(model_override_path) as PackedScene
 	if packed == null and ResourceLoader.exists(DEFAULT_MODEL_PATH):
 		# 先 exists 再 load：文件不存在时 load 会自己打一条 Resource file not found 的 ERROR
 		packed = load(DEFAULT_MODEL_PATH) as PackedScene

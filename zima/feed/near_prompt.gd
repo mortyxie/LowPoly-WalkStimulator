@@ -29,10 +29,14 @@ func _ready() -> void:
 	_label.anchor_right = 1.0
 	_label.anchor_top = 1.0
 	_label.anchor_bottom = 1.0
-	_label.offset_top = -150.0
-	_label.offset_bottom = -100.0
+	_label.offset_left = 48.0
+	_label.offset_right = -48.0
+	_label.offset_top = -170.0
+	_label.offset_bottom = -96.0
 	_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	# 多条提示拼接后可能超过一行，自动换行兜底
+	_label.autowrap_mode = TextServer.AUTOWRAP_ARBITRARY
 	_label.add_theme_font_override("font", cjk_font)
 	_label.add_theme_font_size_override("font_size", FONT_SIZE)
 	_label.add_theme_color_override("font_color", Color(1.0, 0.95, 0.75))

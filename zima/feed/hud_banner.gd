@@ -10,6 +10,10 @@ extends CanvasLayer
 ## 多条消息会排队依次显示。
 
 const FONT_SIZE := 50
+## 长句自动降到的字号（防止一行画出屏幕）
+const FONT_SIZE_LONG := 34
+## 超过这个字数视为长句
+const LONG_TEXT_LIMIT := 18
 const FADE_IN_TIME := 0.25
 const FADE_OUT_TIME := 0.6
 
@@ -34,10 +38,15 @@ func _ready() -> void:
 	_label = Label.new()
 	_label.anchor_left = 0.0
 	_label.anchor_right = 1.0
-	_label.offset_top = 72.0
-	_label.offset_bottom = 160.0
+	# 左右留 48px 边距，长句也不顶到屏幕边
+	_label.offset_left = 48.0
+	_label.offset_right = -48.0
+	_label.offset_top = 64.0
+	_label.offset_bottom = 200.0
 	_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	# 中文按任意字符处换行（WORD 语义对 CJK 不换行），保险兜底
+	_label.autowrap_mode = TextServer.AUTOWRAP_ARBITRARY
 	_label.add_theme_font_override("font", cjk_font)
 	_label.add_theme_font_size_override("font_size", FONT_SIZE)
 	_label.add_theme_color_override("font_outline_color", Color.BLACK)
@@ -59,6 +68,9 @@ func _process_next() -> void:
 	_busy = true
 	var msg: Dictionary = _queue.pop_front()
 	_label.text = msg["text"]
+	# 长句降字号：单行放不下时先缩字，配合自动换行保证不超出屏幕
+	var fs: int = FONT_SIZE if msg["text"].length() <= LONG_TEXT_LIMIT else FONT_SIZE_LONG
+	_label.add_theme_font_size_override("font_size", fs)
 	_label.add_theme_color_override("font_color", msg["color"])
 	# modulate 与 self_modulate 相乘才是最终透明度，两处都要归位
 	_label.modulate.a = 1.0
